@@ -1,7 +1,6 @@
 {
     "version": "0.2.0",
     "configurations": [
-        
         {
             "name": "C/C++: g++.exe build and debug active file",
             "type": "cppdbg",
@@ -27,6 +26,6 @@
                 }
             ],
             "preLaunchTask": "C/C++: g++.exe build active file"
-        },
+        }
     ]
-    }
+}

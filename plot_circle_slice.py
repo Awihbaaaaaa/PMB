@@ -29,7 +29,7 @@ def plot_circle_slice(r, theta):
     
     ax.set_xlabel('X-axis')
     ax.set_ylabel('Y-axis')
-    ax.set_title(f'Circle Slice (r={r}, theta={theta} degrees)')
+    ax.set_title(f'Radar view (r={r}, theta={theta} degrees)')
     ax.grid(True)
     
     return fig, ax

@@ -1,0 +1,17 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:\\Users\\AhmadWahba\\Downloads\\armadillo-12.6.5\\armadillo",
+                "C:/Users/AhmadWahba/Downloads/armadillo-12.6.5/armadillo/include"
+            ],
+            "intelliSenseMode": "clang-x64",
+            "compilerPath": "C:\\msys64\\mingw64\\bin\\gcc.exe",
+            "cStandard": "c11",
+            "cppStandard": "gnu++14"
+        }
+    ],
+    "version": 4
+}

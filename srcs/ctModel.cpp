@@ -9,7 +9,7 @@ double ctModel::getT() const{
     return T;
 };
 
-Matrix ctModel::F(obj object){
+Matrix ctModel::F(objStateSpace object){
     Matrix jacobianMatrix(5,5);
     double x = object.x;
     double y = object.y;
@@ -26,7 +26,7 @@ Matrix ctModel::F(obj object){
     return jacobianMatrix;
 }
 
-void ctModel::f(obj& object){
+void ctModel::f(objStateSpace& object){
     object.x = object.x + T*object.v*cos(object.theta) + T*object.w;
     object.y = object.y + T*object.v*sin(object.theta) + T*object.w;
     double v = object.v;

@@ -12,7 +12,7 @@ void readCSV1(const std::string& filename,
     // Input file stream is created and opened the csv file
     std::ifstream inputFile(filename);
     if (!inputFile.is_open()) {
-        std::cerr << "Failed to open the CSV file." << std::endl;
+        std::cerr << "File is not found!." << std::endl;
         return;
     }
 

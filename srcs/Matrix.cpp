@@ -182,6 +182,22 @@ void Matrix::luDecomposition(Matrix& L, Matrix& U) const {
     }
 }
 
+bool Matrix::operator==(const Matrix& other) const {
+    if (data.size() != other.data.size() || data[0].size() != other.data[0].size()) {
+        return false;
+    }
+
+    for (size_t i = 0; i < data.size(); ++i) {
+        for (size_t j = 0; j < data[0].size(); ++j) {
+            if (data[i][j] != other.data[i][j]) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 // Function to calculate the determinant using LU decomposition
 double Matrix::determinant() const {
     int n = nrRows();

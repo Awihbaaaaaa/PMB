@@ -56,7 +56,8 @@
         "string_view": "cpp",
         "future": "cpp",
         "iomanip": "cpp",
-        "mutex": "cpp"
+        "mutex": "cpp",
+        "cassert": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

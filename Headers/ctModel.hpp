@@ -12,8 +12,8 @@ class ctModel{
     public: 
         ctModel(double T,double  sigmaV,double  sigmaOmega):T(T){};
         double getT() const;
-        Matrix F(obj object);
-        void f(obj& object);
+        Matrix F(objStateSpace object);
+        void f(objStateSpace& object);
         Matrix Q(double sigmaV, double sigmaOmega);
 };
 

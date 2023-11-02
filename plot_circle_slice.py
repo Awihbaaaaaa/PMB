@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+# This is a helper function to plot a polar coordinates for a aradar that takes in two arguments, r & theta.
+# r is the maximum distance the radar can detect points in
+# theta is the field of view of the radar. 
 def plot_circle_slice(r, theta):
     if r < 0:
         raise ValueError("Radius (r) must be non-negative.")

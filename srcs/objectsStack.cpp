@@ -8,7 +8,7 @@ void objectsStack::printDataPoint(double pnt)
 }
 
 void objectsStack::displayStack() {
-    obj* tempObj = head;
+    objStateSpace* tempObj = head;
     while (tempObj) {
         printDataPoint(tempObj -> x);
         printDataPoint(tempObj -> y);
@@ -23,7 +23,7 @@ void objectsStack::displayStack() {
 }
 
 void objectsStack::push(const double* val) {
-    obj* newObj = new obj(val);
+    objStateSpace* newObj = new objStateSpace(val);
     if (!newObj) {
         std::cout << "Stack overflow.\n";
     } else {
@@ -32,14 +32,14 @@ void objectsStack::push(const double* val) {
     }
 }
 
-obj objectsStack::pop() {
+objStateSpace objectsStack::pop() {
     if (head == nullptr) {
         std::cout << "Stack is empty.\n";
-        return obj(nullptr); // Return a default value for T
+        return objStateSpace(nullptr); // Return a default value for T
     }
-    obj* tempObj = head;
+    objStateSpace* tempObj = head;
     head = head->nextObj;
-    obj popedObj;
+    objStateSpace popedObj;
     popedObj.x = tempObj -> x,
     popedObj.y = tempObj -> y,
     popedObj.v = tempObj -> v,
@@ -59,7 +59,7 @@ bool objectsStack::isEmpty() {
 int objectsStack::nrOfObjects(){
     int nrOfObjects = 0;
     
-    obj* tempObj = head;
+    objStateSpace* tempObj = head;
 
     while(tempObj){
         nrOfObjects ++;

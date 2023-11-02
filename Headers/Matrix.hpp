@@ -28,6 +28,7 @@ class Matrix{
         Matrix operator*(const Matrix& other) const;
         Matrix operator+(const Matrix& other) const;
         Matrix operator-(const Matrix& other) const;
+        bool operator==(const Matrix& other) const;
         Matrix transpose() const;
         double determinant() const;
         void luDecomposition(Matrix& L, Matrix& U) const;

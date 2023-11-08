@@ -2,7 +2,7 @@
 #define CTMODEL_HPP
 #include "Matrix.hpp"
 #include <vector>
-#include "../Headers/objectsStack.hpp"
+#include "../Headers/obj.hpp"
 
 class ctModel{
     private:

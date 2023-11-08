@@ -2,6 +2,7 @@
 #define EXTENDEDOBJECTDEFINITION_HPP
 
 #include "../Headers/ctModel.hpp"
+#include <iostream>
 
 class ExtendedObjectDefinition{
     int ext_dim;
@@ -42,6 +43,7 @@ class ExtendedObjectDefinition{
     double getExistanceThreshold() const;
     double getPPP_PruningThreshold() const;
     double getMB_PruningThreshold() const;
+
 };
 
 #endif

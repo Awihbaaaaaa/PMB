@@ -11,6 +11,8 @@
                 "${workspaceFolder}\\srcs\\*.cpp",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe",
+                "-I",
+                "C:\\Users\\AhmadWahba\\AppData\\Local\\Programs\\Python\\Python312\\include",
             ],
             "options": {
                 "cwd": "${fileDirname}"

@@ -3,7 +3,7 @@
 #include <cmath>
 #include "../Headers/Matrix.hpp"
 #include "../Headers/ctModel.hpp"
-#include "../Headers/objectsStack.hpp"
+#include "../Headers/obj.hpp"
 
 double ctModel::getT() const{
     return T;

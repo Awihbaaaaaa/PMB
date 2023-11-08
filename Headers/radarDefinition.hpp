@@ -1,7 +1,7 @@
 #ifndef RADARDEFINITION_HPP
 #define RADARDEFINITION_HPP
 #include "Matrix.hpp"
-#include "objectsStack.hpp"
+#include "obj.hpp"
 
 class radarDefinition{
     private:
@@ -24,10 +24,25 @@ class radarDefinition{
         double T = 1.0/10.0;
         double ci_clutterIntensity;
         double deathForce = 1.0;
-
+        int nr_exp_objs;
+        int objs_rate;
+        int dof;
+        int extentCov;
     public:
-        radarDefinition(double detectionProbability, double gatingThreshold, double ciClutterIntensity):
-                          P_d(detectionProbability),gatingThreshold(gatingThreshold),ci_clutterIntensity(ciClutterIntensity){};
+        radarDefinition(double detectionProbability, 
+                        double gatingThreshold, 
+                        double ciClutterIntensity,
+                        int nrExpObjs,
+                        int objectsRate,
+                        int extentDegreesOfFreedom,
+                        int extentCovariance):
+                          P_d(detectionProbability),
+                          gatingThreshold(gatingThreshold),
+                          ci_clutterIntensity(ciClutterIntensity),
+                          nr_exp_objs(nrExpObjs),
+                          objs_rate(objectsRate),
+                          dof(extentDegreesOfFreedom),
+                          extentCov(extentCovariance){};
         int getmeasurements_dimension();
         Matrix getMeasurementsCovariance();
         double getRadarDetectionProbability();

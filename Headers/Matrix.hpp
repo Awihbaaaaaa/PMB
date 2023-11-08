@@ -13,7 +13,7 @@ class Matrix{
 
         Matrix(int rows, int cols, double val = 0.0):data(rows,std::vector<double>(cols, val)){}
         
-        Matrix(){};
+        Matrix():data(0, std::vector<double>(0, 0.0)){};
         int nrRows() const;
         int nrCols() const;        
 
@@ -22,17 +22,20 @@ class Matrix{
         Matrix forwardSubstitution(const Matrix& L, const Matrix& b);
         void resize(int newRows, int cols);
         void setColumn(int col, const Matrix& columnData);
+        std::vector<std::vector<double>> getData() const;
         void updateData(const std::vector<std::vector<double>>& newData);
         Matrix getColumn(int col) const;
         Matrix& operator=(std::initializer_list<std::initializer_list<double>> values);
         Matrix operator*(const Matrix& other) const;
+        Matrix operator*(const double scaler) const;
         Matrix operator+(const Matrix& other) const;
         Matrix operator-(const Matrix& other) const;
         bool operator==(const Matrix& other) const;
         Matrix transpose() const;
         double determinant() const;
         void luDecomposition(Matrix& L, Matrix& U) const;
-
+        bool isempty() const;
+        static Matrix identity(int size);
         double& operator()(int row, int col);
         double operator()(int row, int col) const;
         

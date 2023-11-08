@@ -22,7 +22,8 @@ class objStateSpace{
                                 w(value[4]),
                                 nextObj(nullptr) {};
     objStateSpace() : x(0.0), y(0.0), v(0.0), theta(0.0), w(0.0), nextObj(nullptr) {};
-    
+
+    friend std::ostream& operator<<(std::ostream &os, const objStateSpace &obj);  
 };
 
 /* 

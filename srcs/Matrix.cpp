@@ -19,12 +19,26 @@ std::ostream& operator<<(std::ostream &os, const Matrix &m) {
     return os;
 }
 
+std::vector<std::vector<double>> Matrix::getData() const {
+    return data;
+}
+
 int Matrix::nrRows() const{
     return data.size();
 }
 
 int Matrix::nrCols() const{
     return data[0].size();
+}
+
+Matrix Matrix::identity(int size) {
+    Matrix identityMatrix(size, size, 0.0);
+
+    for (int i = 0; i < size; i++) {
+        identityMatrix(i, i) = 1.0;
+    }
+
+    return identityMatrix;
 }
 
 void Matrix::resize(int newRows, int cols){
@@ -71,6 +85,16 @@ Matrix Matrix::operator*(const Matrix& other) const{
     return res;
 }
 
+Matrix Matrix::operator*(const double scaler) const{
+    Matrix res(nrRows(), nrCols());
+    for(int i = 0; i < nrRows(); i++){
+        for(int j = 0; j < nrCols(); j++){
+            res(i,j) = scaler * data[i][j];
+        }
+    }
+    return res;
+}
+
 Matrix Matrix::operator+(const Matrix& other) const{
     if(nrRows() != other.nrRows() || nrCols() != other.nrCols()){
         std::cout << "The matrices dimensions don't match. Hit enter to exit.";
@@ -108,14 +132,19 @@ Matrix Matrix::operator-(const Matrix& other) const{
 }
 
 Matrix& Matrix::operator=(std::initializer_list<std::initializer_list<double>> values){
-    int rows = nrRows();
-    int cols = nrCols();
+    int newRows = values.size();
+    int newCols = (newRows > 0) ? values.begin()->size() : 0;
+
+    if (newRows != nrRows() || newCols != nrCols()) {
+        resize(newRows, newCols);
+    }
+
     int i = 0;
     int j = 0;
 
     for(const auto& row : values){
         for(double value : row){
-            if (i < rows && j < cols) {
+            if (i < newRows && j < newCols) {
                 data[i][j] = value;
             }
             j++;
@@ -125,6 +154,10 @@ Matrix& Matrix::operator=(std::initializer_list<std::initializer_list<double>> v
     }
 
     return *this;
+}
+
+bool Matrix::isempty()const{
+    return data.empty();
 }
 
 Matrix Matrix::transpose() const{

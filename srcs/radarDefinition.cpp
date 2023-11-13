@@ -25,6 +25,10 @@ double radarDefinition::getDeathForce(){
     return this->deathForce;
 };
 
+double radarDefinition::getGatingThreshold(){
+    return gatingThreshold;
+};
+
 Matrix radarDefinition::measurementPrediction(const objStateSpace* object){
     Matrix Z(3,1);
     double T = this->T;

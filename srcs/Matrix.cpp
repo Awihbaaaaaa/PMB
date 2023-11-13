@@ -64,8 +64,13 @@ double Matrix::operator()(int row, int col) const{
 }
 
 Matrix Matrix::operator*(const Matrix& other) const{
-    if(nrRows() != other.nrRows() || nrCols() != other.nrCols()){
-        std::cout << "The matrices dimensions don't match. Hit enter to exit.";
+    std::cout << nrRows() << std::endl;
+    std::cout << nrCols() << std::endl;
+    std::cout << other.nrRows() << std::endl;
+    std::cout << other.nrCols() << std::endl;
+
+    if(nrCols() != other.nrRows()){
+        std::cout << "The matrices dimensions don't match. Multiplication is not possible. Hit enter to exit.";
         std::cin.get();
         throw std::invalid_argument("Matrices dimensions doesn't match.");
     }
@@ -85,7 +90,7 @@ Matrix Matrix::operator*(const Matrix& other) const{
     return res;
 }
 
-Matrix Matrix::operator*(const double scaler) const{
+/* Matrix Matrix::operator*(const double scaler) const{
     Matrix res(nrRows(), nrCols());
     for(int i = 0; i < nrRows(); i++){
         for(int j = 0; j < nrCols(); j++){
@@ -93,11 +98,11 @@ Matrix Matrix::operator*(const double scaler) const{
         }
     }
     return res;
-}
+} */
 
 Matrix Matrix::operator+(const Matrix& other) const{
     if(nrRows() != other.nrRows() || nrCols() != other.nrCols()){
-        std::cout << "The matrices dimensions don't match. Hit enter to exit.";
+        std::cout << "The matrices dimensions don't match. Addition is not possible. Hit enter to exit.";
         std::cin.get();
         throw std::invalid_argument("Matrices dimensions doesn't match.");
     }
@@ -115,7 +120,7 @@ Matrix Matrix::operator+(const Matrix& other) const{
 
 Matrix Matrix::operator-(const Matrix& other) const{
     if(nrRows() != other.nrRows() || nrCols() != other.nrCols()){
-        std::cout << "The matrices dimensions don't match. Hit enter to exit.";
+        std::cout << "The matrices dimensions don't match. Subtraction is not possible. Hit enter to exit.";
         std::cin.get();
         throw std::invalid_argument("Matrices dimensions doesn't match.");
     }
@@ -161,10 +166,10 @@ bool Matrix::isempty()const{
 }
 
 Matrix Matrix::transpose() const{
-    Matrix res(nrRows(), nrCols());
+    Matrix res(nrCols(),nrRows());
     for(int i = 0; i < nrRows(); i++){
         for(int j = 0; j < nrCols(); j++){
-            res(i,j) = data[j][i];
+            res(j,i) = data[i][j];
             //res(j,i) = data[i][j];
         }
     }
@@ -304,7 +309,7 @@ void Matrix::setColumn(int col, const Matrix& columnData) {
         data[i][col] = columnData(i, 0);
     }
 }
-
+*/
 Matrix Matrix::getColumn(int col) const {
     int n = nrRows();
     if (col < 0 || col >= nrCols()) {
@@ -319,6 +324,7 @@ Matrix Matrix::getColumn(int col) const {
     return column;
 }
 
+/*
 Matrix Matrix::inv() {
     int n = nrRows();
     if (n != nrCols()) {
@@ -408,4 +414,20 @@ Matrix Matrix::inv(){
     return inverse;
 }
 
+Matrix Matrix::sumColumns() const{
+    if (data.empty() || data[0].empty()) {
+        return Matrix();
+    }
 
+    /* int numRows = nrRows();
+    int numCols = nrCols(); */
+    Matrix result(1, nrCols(), 0.0);
+
+    for (int col = 0; col < nrCols(); ++col) {
+        for (int row = 0; row < nrRows(); ++row) {
+            result(0, col) += data[row][col];
+        }
+    }
+
+    return result;
+}

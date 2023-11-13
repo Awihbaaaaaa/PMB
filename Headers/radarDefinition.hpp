@@ -44,6 +44,7 @@ class radarDefinition{
                           dof(extentDegreesOfFreedom),
                           extentCov(extentCovariance){};
         int getmeasurements_dimension();
+        double getGatingThreshold();
         Matrix getMeasurementsCovariance();
         double getRadarDetectionProbability();
         double getCIClutterIntensity();

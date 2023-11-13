@@ -36,10 +36,10 @@ void ctModel::f(objStateSpace& object){
 }
 
 // motion noise covariance
-Matrix ctModel::Q(double sigmaV, double sigmaOmega){
+Matrix ctModel::Q(){
     Matrix motionNoiceCovariance(5,5);
-    motionNoiceCovariance(2,2) = pow(sigmaV,2);
-    motionNoiceCovariance(4,4) = pow(sigmaOmega,2);
+    motionNoiceCovariance(2,2) = pow(this->sigmaV,2);
+    motionNoiceCovariance(4,4) = pow(this->sigmaOmega,2);
 
     return motionNoiceCovariance;
 }

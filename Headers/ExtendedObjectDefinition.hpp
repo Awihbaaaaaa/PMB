@@ -20,7 +20,7 @@ class ExtendedObjectDefinition{
                           double survivalProbability,
                           double shapeUncertainty,
                           double forgettingFactor,
-                          const Matrix rotationMatrix,
+                          //const Matrix rotationMatrix,
                           double existanceThreshold,
                           double PPP_pruningThreshold,
                           double MB_pruningThreshold)
@@ -29,7 +29,7 @@ class ExtendedObjectDefinition{
                             Ps(survivalProbability),
                             eta(shapeUncertainty),
                             tao(forgettingFactor),
-                            M(rotationMatrix),
+                            //M(rotationMatrix),
                             r(existanceThreshold),
                             PPP_pruningThreshold(PPP_pruningThreshold),
                             MB_pruningThreshold(MB_pruningThreshold){
@@ -43,6 +43,7 @@ class ExtendedObjectDefinition{
     double getExistanceThreshold() const;
     double getPPP_PruningThreshold() const;
     double getMB_PruningThreshold() const;
+    const ctModel getMotionModel() const;
 
 };
 

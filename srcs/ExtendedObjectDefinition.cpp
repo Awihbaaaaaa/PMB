@@ -11,6 +11,10 @@ Matrix ExtendedObjectDefinition::rotationMatrix(const objStateSpace* object){
     return m;
 }
 
+const ctModel ExtendedObjectDefinition::getMotionModel() const{
+    return this -> motionModel;
+}
+
  int ExtendedObjectDefinition::getExtensionDimension() const{
     return this->ext_dim;
 };

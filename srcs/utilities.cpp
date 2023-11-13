@@ -2,9 +2,9 @@
 #include <random>
 #include <cmath>
 
-ObjectsCollection initPPP(const double tot_exp_objs,
+/* ObjectsCollection initPPP(const double tot_exp_objs,
                         const double objs_rate,
-                        const double dof);
+                        const double dof); */
 
 double deg2rad(double degrees) {
    return degrees * M_PI / 180.0;
@@ -31,8 +31,8 @@ ObjectsCollection initPPP(const double tot_exp_objs,
             UntrackedObj untrackedObj;
             untrackedObj.X.x = ran * cos(deg2rad(ang));
             untrackedObj.X.y = ran * sin(deg2rad(ang));
-            untrackedObj.X.v = genRanNr(0, 20); // You need to implement genRanNr.
-            untrackedObj.X.theta = genRanNr(0, 2 * M_PI); // You need to implement genRanNr.
+            untrackedObj.X.v = genRanNr(0, 20); 
+            untrackedObj.X.theta = genRanNr(0, 2 * M_PI); 
             untrackedObj.X.w = 0.1;
 
             if (ang == -50 || ang == 50 || ran == 47.5) {
@@ -41,8 +41,8 @@ ObjectsCollection initPPP(const double tot_exp_objs,
                untrackedObj.w_ppp = 0.08;
             }
 
-            untrackedObj.P = Matrix(5, 5, 2.0) * Matrix::identity(5); // Adjust the diagonal values accordingly.
-            untrackedObj.v = dof; // Adjust the diagonal values accordingly.
+            untrackedObj.P = Matrix(5, 5, 2.0) * Matrix::identity(5);
+            untrackedObj.v = dof;
             untrackedObj.V = V;
 
             collection.PPP.push_back(untrackedObj);
@@ -52,4 +52,11 @@ ObjectsCollection initPPP(const double tot_exp_objs,
    }
 
    return collection;
+}
+
+
+void combineComponents(std::vector<UntrackedObj>& PPP, std::vector<UntrackedObj> newPPP){
+    for(UntrackedObj tempObj:newPPP){
+        PPP.push_back(tempObj);
+    }
 }

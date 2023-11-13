@@ -3,42 +3,82 @@ using namespace std;
 #include <cmath> 
 #include <vector>
 #include <limits>
-//#include "Headers/Matrix.hpp"
+#include "Headers/declarations.hpp"
 //#include "Headers/ctModel.hpp"
 //#include "Headers/objectsStack.hpp"
-#include "Headers/ExtendedObjectDefinition.hpp"
-#include "Headers/radarDefinition.hpp"
+//#include "Headers/ExtendedObjectDefinition.hpp"
+//#include "Headers/radarDefinition.hpp"
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <cassert>
-#include "Headers/obj.hpp"
+//#include "Headers/obj.hpp"
 #define MIN_DOUBLE -std::numeric_limits<double>::max()
 #include <random>
-#include <cmath>
-
-void runRadarTest();
-void testMatrix_cpp();
-void objectCreationTest();
-void readCSV();
-double deg2rad(double degrees);
-double genRanNr(double min, double max); 
-ObjectsCollection initPPP(const double tot_exp_objs,
-                        const double objs_rate,
-                        const double dof); 
+//#include <cmath>
 
 int main() {
-    runRadarTest();
-    testMatrix_cpp();
-    objectCreationTest();
-    Matrix V(3,3);
-    ObjectsCollection testInit = initPPP(5.0, 10.0, 160.0);
-    for(const UntrackedObj obj: testInit.PPP){
-        cout << obj.w_ppp << endl;
-    }
-    cout << testInit.PPP.size();
+    // Motion model parameters
+    double T = 0.1, sigmaV = 1.0, sigmav = M_PI/15; 
+    ctModel motionModel(T,sigmaV, sigmav);
 
-    ObjectsCollection Rad;
+    // Extended object representation parameters
+    double extentDim = 3, survivalProbability = 0.35, shapeUncertainty = 0.1;
+    double forgettingFactor = 8, ciClusteringThreshold = 1.5, minNrPnts= 3, objectsRate = 10;
+    double existanceThreshold = 0.3, PPP_pruningThreshold = 0.034, MB_pruningThreshold = 0.4;
+    ExtendedObjectDefinition extendedObjDef(extentDim,
+                                            motionModel,
+                                            survivalProbability,
+                                            shapeUncertainty,
+                                            forgettingFactor,
+                                            existanceThreshold,
+                                            PPP_pruningThreshold,
+                                            MB_pruningThreshold);
+
+    // Radar parameters
+    double detectionProbability = 0.9, gatingThreshold = 100, expectedObjects = 5, extentDegreesOfFreedom = 150, extentCov = 60;
+    ObjectsCollection testPPP = initPPP(expectedObjects, objectsRate, extentDegreesOfFreedom);
+    radarDefinition radar(detectionProbability,
+                          gatingThreshold,
+                          ciClusteringThreshold,
+                          expectedObjects,
+                          objectsRate,
+                          extentDegreesOfFreedom,
+                          extentCov);
+
+    /* runRadarTest();
+    testMatrix_cpp();
+    objectCreationTest(); */
+    
+    cout << "Obj 1" << ": alpha: " << testPPP.PPP[0].alpha << " beta: " << testPPP.PPP[0].beta << " weight: " << testPPP.PPP[0].w_ppp << " " << testPPP.PPP[0].X << endl;
+    cout << "Obj 2" << ": alpha: " << testPPP.PPP[1].alpha << " beta: " << testPPP.PPP[1].beta << " weight: " << testPPP.PPP[1].w_ppp << " " << testPPP.PPP[1].X << endl;
+    cout << "Obj 3" << ": alpha: " << testPPP.PPP[2].alpha << " beta: " << testPPP.PPP[2].beta << " weight: " << testPPP.PPP[2].w_ppp << " " << testPPP.PPP[2].X << endl;
+    
+    // combineComponents(currentPPP, newPPP);
+    Matrix meas(3,10);
+    TrackedObj obj1;
+    obj1.X.x = 1.1;
+    obj1.X.y = 2.1;
+
+    testPPP.MB.push_back(obj1);
+
+    TrackedObj obj2;
+    obj2.X.x = -23;
+    obj2.X.y = 23;
+
+    testPPP.MB.push_back(obj2);
+
+    meas = {{1.1, 1.0, 0.9, 7,  0.5,  12, -22.9, -23, -23.2}, 
+            {2.1, 2.1, 2.0, 1, -0.5, -12,  22.9,  23,  23.2},
+            {5  , 3  , -6 , 1,    2,   3,   1  ,  2 ,    5 }};
+    
+    
+    predict(testPPP, extendedObjDef);
+    update(&testPPP, &meas, &radar, &extendedObjDef);
+
+    cout << testPPP.PPP.size();
+
+    /* ObjectsCollection Rad;
 
     double values[] = {MIN_DOUBLE,MIN_DOUBLE,MIN_DOUBLE,MIN_DOUBLE,MIN_DOUBLE};
     
@@ -87,12 +127,11 @@ int main() {
     initMBObject.P = Matrix(5,5);
 
     Rad.PPP.push_back(initPPPObject);
-    Rad.MB.push_back(initMBObject); */
-
+    Rad.MB.push_back(initMBObject); 
     std::cout << Rad.PPP[0].X;
     std::cout << Rad.MB[0].X;
 
-    readCSV();
+    readCSV(); */
     
     /* objectsStack testStack;
 
@@ -108,7 +147,7 @@ int main() {
 
     ctModel model(0.1, 0.01, 0.01);
     Matrix rotationMatrix(3,3);
-    ExtendedObjectDefinition objPars(3,model,0.1,0.2,0.3,rotationMatrix,0.4,0.5,0.6);
+    ExtendedObjectDefinition objPars(3,model,0.1,0.2,0.3,0.4,0.5,0.6);
     cout << objPars.getExtensionDimension() << endl;
     cout << objPars.getSurvivalProbability() << endl;
     cout << objPars.getExistanceThreshold() << endl;

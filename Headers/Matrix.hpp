@@ -18,7 +18,7 @@ class Matrix{
         int nrCols() const;        
 
         Matrix inv();
-        Matrix sumColumns() const;
+        Matrix sumRows() const;
         Matrix backwardSubstitution(const Matrix& U, const Matrix& b);
         Matrix forwardSubstitution(const Matrix& L, const Matrix& b);
         void resize(int newRows, int cols);

@@ -39,8 +39,8 @@ void predictMB(std::vector<TrackedObj>& MB, ExtendedObjectDefinition extendedObj
     double d = extendedObjDef.getExtensionDimension();
     double eta = extendedObjDef.getShapeUncertainty();
     
-    if(!MB.empty()){
-        for(TrackedObj obj:MB){
+    if(MB[0].r_MB){
+        for(TrackedObj& obj:MB){
             obj.r_MB = extendedObjDef.getSurvivalProbability()*obj.r_MB;
             obj.alpha = obj.alpha/eta;
             obj.beta = obj.beta/eta;

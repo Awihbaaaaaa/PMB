@@ -55,8 +55,12 @@ ObjectsCollection initPPP(const double tot_exp_objs,
 }
 
 
-void combineComponents(std::vector<UntrackedObj>& PPP, std::vector<UntrackedObj> newPPP){
-    for(UntrackedObj tempObj:newPPP){
-        PPP.push_back(tempObj);
-    }
+void combinePPPs(std::vector<UntrackedObj>& PPP, std::vector<UntrackedObj> newPPP){
+    PPP.insert(PPP.end(), newPPP.begin(), newPPP.end());
 }
+
+void combineMBs(std::vector<TrackedObj>& MB, std::vector<TrackedObj> newMB){
+   MB.insert(MB.end(), newMB.begin(), newMB.end());
+}
+
+

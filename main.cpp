@@ -1,17 +1,19 @@
 #include <iostream>
-using namespace std;
+using namespace std;/* 
 #include <cmath> 
 #include <vector>
-#include <limits>
+#include <limits> */
 #include "Headers/declarations.hpp"
 //#include "Headers/ctModel.hpp"
 //#include "Headers/objectsStack.hpp"
 //#include "Headers/ExtendedObjectDefinition.hpp"
 //#include "Headers/radarDefinition.hpp"
-#include <fstream>
+
+/* #include <fstream>
 #include <sstream>
 #include <string>
 #include <cassert>
+ */
 //#include "Headers/obj.hpp"
 #define MIN_DOUBLE -std::numeric_limits<double>::max()
 #include <random>
@@ -45,10 +47,6 @@ int main() {
                           objectsRate,
                           extentDegreesOfFreedom,
                           extentCov);
-
-    /* runRadarTest();
-    testMatrix_cpp();
-    objectCreationTest(); */
     
     cout << "Obj 1" << ": alpha: " << testPPP.PPP[0].alpha << " beta: " << testPPP.PPP[0].beta << " weight: " << testPPP.PPP[0].w_ppp << " " << testPPP.PPP[0].X << endl;
     cout << "Obj 2" << ": alpha: " << testPPP.PPP[1].alpha << " beta: " << testPPP.PPP[1].beta << " weight: " << testPPP.PPP[1].w_ppp << " " << testPPP.PPP[1].X << endl;
@@ -74,9 +72,7 @@ int main() {
     
     
     predict(testPPP, extendedObjDef);
-    update(&testPPP, &meas, &radar, &extendedObjDef);
-
-    cout << testPPP.PPP.size();
+    update(testPPP, &meas, &radar, &extendedObjDef);
 
     /* ObjectsCollection Rad;
 
@@ -132,41 +128,10 @@ int main() {
     std::cout << Rad.MB[0].X;
 
     readCSV(); */
-    
-    /* objectsStack testStack;
-
-    double testObject1[5] = {5,5,3,0,0};
-    double testObject2[5] = {0,0,3,0,0};
-    double testObject3[5] = {-5,5,3,0,0};
-
-    testStack.push(testObject1);
-    testStack.push(testObject2);
-    testStack.push(testObject3);
-
-    testStack.displayStack(); */
 
     ctModel model(0.1, 0.01, 0.01);
     Matrix rotationMatrix(3,3);
     ExtendedObjectDefinition objPars(3,model,0.1,0.2,0.3,0.4,0.5,0.6);
-    cout << objPars.getExtensionDimension() << endl;
-    cout << objPars.getSurvivalProbability() << endl;
-    cout << objPars.getExistanceThreshold() << endl;
-    cout << objPars.getForgettingFactor() << endl;
-    cout << objPars.getMB_PruningThreshold() << endl;
-    cout << objPars.getPPP_PruningThreshold() << endl; 
-    /* objStateSpace poppedObject = testStack.pop();   
-    cout << objPars.rotationMatrix(&poppedObject);
-        
-    objStateSpace* currObj = testStack.head;
-    while(currObj){
-        model.f(*currObj);
-        currObj = currObj -> nextObj;
-    }
-    testStack.displayStack();
-
-    testStack.push(testObject2);
-
-    testStack.displayStack(); */
 
     cin.get();
 

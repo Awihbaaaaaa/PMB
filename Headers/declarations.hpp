@@ -1,5 +1,14 @@
 #ifndef DECLARATIONS_HPP
 #define DECLARATIONS_HPP
+
+#include <cmath> 
+#include <vector>
+#include <limits>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <cassert>
+
 // ctModel is inside extendedObjectDefinition
 #include "ExtendedObjectDefinition.hpp"
 
@@ -7,6 +16,7 @@
 #include "obj.hpp"
 
 #include "radarDefinition.hpp"
+
 void runRadarTest();
 
 void testMatrix_cpp();
@@ -19,6 +29,9 @@ double deg2rad(double degrees);
 
 double genRanNr(double min, double max); 
 
+void combinePPPs(std::vector<UntrackedObj>& PPP, std::vector<UntrackedObj> newPPP);
+
+void combineMBs(std::vector<TrackedObj>& MB, std::vector<TrackedObj> newMB);
 
 ObjectsCollection initPPP(const double tot_exp_objs,
                           const double objs_rate,
@@ -27,10 +40,26 @@ ObjectsCollection initPPP(const double tot_exp_objs,
 void predict(ObjectsCollection& CurrentObjectsCollection,
              ExtendedObjectDefinition extendedObjDef);
 
-void update(ObjectsCollection* collection,
+void update(ObjectsCollection& collection,
             Matrix* data,
             radarDefinition* radar,
             ExtendedObjectDefinition* extObj);
 
+class measurements{
+    public:
+        Matrix* z;
+        Matrix inGated;
+        Matrix outGated;
+        measurements(Matrix* measurements):z(measurements){};
+};
+
+void elipsoidalGating(radarDefinition* radar,
+                      std::vector<TrackedObj>* MB,
+                      measurements& currMeasurements);
+
+void PPP_update(ObjectsCollection& collection,
+                measurements* currMeasurements,
+                radarDefinition* radar,
+                ExtendedObjectDefinition* extObj);
 
 #endif

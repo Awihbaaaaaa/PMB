@@ -64,11 +64,6 @@ double Matrix::operator()(int row, int col) const{
 }
 
 Matrix Matrix::operator*(const Matrix& other) const{
-    std::cout << nrRows() << std::endl;
-    std::cout << nrCols() << std::endl;
-    std::cout << other.nrRows() << std::endl;
-    std::cout << other.nrCols() << std::endl;
-
     if(nrCols() != other.nrRows()){
         std::cout << "The matrices dimensions don't match. Multiplication is not possible. Hit enter to exit.";
         std::cin.get();
@@ -414,7 +409,7 @@ Matrix Matrix::inv(){
     return inverse;
 }
 
-Matrix Matrix::sumColumns() const{
+Matrix Matrix::sumRows() const{
     if (data.empty() || data[0].empty()) {
         return Matrix();
     }

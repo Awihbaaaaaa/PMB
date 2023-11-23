@@ -17,11 +17,15 @@
 
 #include "radarDefinition.hpp"
 
+#include "dbscan.hpp"
+
 void runRadarTest();
 
 void testMatrix_cpp();
 
 void objectCreationTest();
+
+void TestDBSCAN();
 
 void readCSV();
 
@@ -54,12 +58,14 @@ class measurements{
 };
 
 void elipsoidalGating(radarDefinition* radar,
-                      std::vector<TrackedObj>* MB,
+                      ObjectsCollection* objs,
                       measurements& currMeasurements);
 
 void PPP_update(ObjectsCollection& collection,
                 measurements* currMeasurements,
                 radarDefinition* radar,
                 ExtendedObjectDefinition* extObj);
+
+
 
 #endif

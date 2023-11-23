@@ -5,7 +5,7 @@
 #include "../Headers/Matrix.hpp"
 #include <cmath>
 
-std::ostream& operator<<(std::ostream &os, const Matrix &m) {
+/* std::ostream& operator<<(std::ostream &os, const Matrix &m) {
     int rows = m.nrRows();
     int cols = m.nrCols();
 
@@ -17,7 +17,24 @@ std::ostream& operator<<(std::ostream &os, const Matrix &m) {
     }
 
     return os;
+} */
+std::ostream& operator<<(std::ostream& os, const Matrix& m) {
+    int rows = m.nrRows();
+    int cols = m.nrCols();
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (j > 0) {
+                os << " | ";
+            }
+            os << std::setw(8) << std::setprecision(4) << m(i, j);
+        }
+        os << std::endl;
+    }
+
+    return os;
 }
+
 
 std::vector<std::vector<double>> Matrix::getData() const {
     return data;
@@ -41,8 +58,35 @@ Matrix Matrix::identity(int size) {
     return identityMatrix;
 }
 
-void Matrix::resize(int newRows, int cols){
-    data.resize(newRows, std::vector<double>(cols,0.0));
+void Matrix::resize(int newRows, int newCols){
+    //data.resize(newRows, std::vector<double>(cols,0.0));
+    if (newRows < 0 || newCols < 0) {
+        throw std::invalid_argument("Number of rows and columns must be non-negative");
+    }
+
+    // Shrink rows if needed
+    if (newRows < nrRows()) {
+        data.resize(newRows);
+    }
+
+    // Shrink columns if needed
+    if (newCols < nrCols()) {
+        for (auto& row : data) {
+            row.resize(newCols);
+        }
+    }
+
+    // Expand rows if needed
+    if (newRows > nrRows()) {
+        data.resize(newRows, std::vector<double>(newCols, 0.0));
+    }
+
+    // Expand columns if needed
+    if (newCols > nrCols()) {
+        for (auto& row : data) {
+            row.resize(newCols, 0.0);
+        }
+    }
 }
 
 void Matrix::updateData(const std::vector<std::vector<double>>& newData) {
@@ -263,6 +307,16 @@ double Matrix::determinant() const {
     return det;
 }
 
+void Matrix::setColumn(int col, const Matrix& columnData) {
+    if (col >= nrCols() || columnData.nrRows() != nrRows() || columnData.nrCols() != 1) {
+        throw std::invalid_argument("Invalid column or dimension mismatch");
+    }
+
+    for (int i = 0; i < nrRows(); i++) {
+        data[i][col] = columnData(i, 0);
+    }
+}
+
 /* Matrix Matrix::forwardSubstitution(const Matrix& L, const Matrix& b) {
     int n = L.nrRows();
     Matrix y(n, 1);
@@ -317,6 +371,33 @@ Matrix Matrix::getColumn(int col) const {
         column(i, 0) = data[i][col];
     }
     return column;
+}
+
+Matrix Matrix::getRow(int row) const {
+    int n = nrCols();
+    if (row < 0 || row >= n) {
+        throw std::out_of_range("Invalid row index");
+    }
+
+    Matrix rowMatrix(1, n);
+    for (int i = 0; i < n; i++) {
+        std::cout << data[row][i];
+        rowMatrix(0, i) = data[row][i];
+    }
+    std::cout << rowMatrix;
+    return rowMatrix;
+} 
+
+void Matrix::removeColumn(int col){
+    if(col < 0 || col>nrCols()){
+        throw std::invalid_argument("Invalid column or dimension mismatch");
+    }
+    Matrix tempColumn(3,1);
+    for(int i = col+1; i<nrCols();++i){
+        tempColumn = this->getColumn(i);
+        setColumn(i-1,tempColumn);
+    }
+    resize(nrRows(), nrCols()-1);
 }
 
 /*
@@ -414,8 +495,6 @@ Matrix Matrix::sumRows() const{
         return Matrix();
     }
 
-    /* int numRows = nrRows();
-    int numCols = nrCols(); */
     Matrix result(1, nrCols(), 0.0);
 
     for (int col = 0; col < nrCols(); ++col) {

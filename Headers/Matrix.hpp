@@ -23,9 +23,11 @@ class Matrix{
         Matrix forwardSubstitution(const Matrix& L, const Matrix& b);
         void resize(int newRows, int cols);
         void setColumn(int col, const Matrix& columnData);
+        void removeColumn(int col);
         std::vector<std::vector<double>> getData() const;
         void updateData(const std::vector<std::vector<double>>& newData);
         Matrix getColumn(int col) const;
+        Matrix getRow(int row) const;
         Matrix& operator=(std::initializer_list<std::initializer_list<double>> values);
         Matrix operator*(const Matrix& other) const;
         Matrix operator*(const double scaler) const;

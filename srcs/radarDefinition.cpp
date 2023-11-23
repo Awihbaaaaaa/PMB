@@ -29,6 +29,14 @@ double radarDefinition::getGatingThreshold(){
     return gatingThreshold;
 };
 
+double radarDefinition::getEpsCluster(){
+    return epsCluster;
+};
+
+int radarDefinition::getMinNrPntsCluster(){
+    return minNrPntsInCluster;
+};
+
 Matrix radarDefinition::measurementPrediction(const objStateSpace* object){
     Matrix Z(3,1);
     double T = this->T;

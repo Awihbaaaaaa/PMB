@@ -79,9 +79,11 @@ void update(ObjectsCollection& collection,
 
                 measurements currentMeasurements(data);
                 std::vector<TrackedObj> tempppppp = collection.MB;
-                elipsoidalGating(radar, &collection.MB, currentMeasurements);
-                std::cout <<currentMeasurements.inGated;
-                std::cout <<currentMeasurements.outGated;
+                elipsoidalGating(radar, &collection, currentMeasurements);
+               /*  
+               std::cout <<currentMeasurements.inGated;
+               std::cout <<currentMeasurements.outGated; 
+               */
                 
                 PPP_update(collection,
                            &currentMeasurements,

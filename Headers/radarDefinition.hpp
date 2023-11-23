@@ -28,6 +28,8 @@ class radarDefinition{
         int objs_rate;
         int dof;
         int extentCov;
+        double epsCluster;
+        int minNrPntsInCluster;
     public:
         radarDefinition(double detectionProbability, 
                         double gatingThreshold, 
@@ -35,14 +37,18 @@ class radarDefinition{
                         int nrExpObjs,
                         int objectsRate,
                         int extentDegreesOfFreedom,
-                        int extentCovariance):
+                        int extentCovariance,
+                        double epsClusteringThreshold,
+                        int minNrPntsCluster):
                           P_d(detectionProbability),
                           gatingThreshold(gatingThreshold),
                           ci_clutterIntensity(ciClutterIntensity),
                           nr_exp_objs(nrExpObjs),
                           objs_rate(objectsRate),
                           dof(extentDegreesOfFreedom),
-                          extentCov(extentCovariance){};
+                          extentCov(extentCovariance),
+                          epsCluster(epsClusteringThreshold),
+                          minNrPntsInCluster(minNrPntsCluster){};
         int getmeasurements_dimension();
         double getGatingThreshold();
         Matrix getMeasurementsCovariance();
@@ -51,6 +57,8 @@ class radarDefinition{
         double getDeathForce();
         Matrix measurementPrediction(const objStateSpace* object);
         Matrix measurementModel(const objStateSpace* object);
+        double getEpsCluster();
+        int getMinNrPntsCluster();
 };
 
 #endif

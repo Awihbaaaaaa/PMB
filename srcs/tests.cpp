@@ -4,10 +4,16 @@
 #include <assert.h>
 #include <cmath>
 #include "../Headers/readCSV.hpp"
+#include "../Headers/dbscan.hpp"
+
+/* 
+This file include some test functions definitions. To run the test,
+call the function handle in main.
+ */
 
 void runRadarTest(){
     // Create a radarDefinition object
-    radarDefinition radarDefinition(0.9,100,0.6,5,10,150,60);
+    radarDefinition radarDefinition(0.9,100,0.6,5,10,150,60,1.5,1);
 
     // Test measurementModel
     objStateSpace testObject;
@@ -49,6 +55,10 @@ void testMatrix_cpp(){
         {2, 8, -3, 1},
         {5, 3, -6, 1},
         {3, 1, 6, 2}};
+    std::cout << A;
+    std::cout << "Colomn 1 is to be removed" << std::endl;
+    A.removeColumn(1);
+    std::cout << A;
 
     // Testing another way for initialization of the declared matrix A
     A(0, 0) = 3.0;
@@ -163,5 +173,40 @@ void readCSV(){
             std::cout << value << " ";
         }
         std::cout << std::endl;  // Print a newline after each row
+    }
+}
+
+
+void TestDBSCAN(){
+    Matrix Z(3,4);
+    Z = {{15.0, 2.0, 2.5, 10.0},
+        {50.0, 6.0, 7.0, 9.0},
+        {0.1, 0.2, 0.3, 0.4}};
+
+    std::cout << "The set of measurements we have is:\n" << Z;
+    std::cout << "eps is: " << "1.5" << " and the minimum number of points in each cluster is: 1 " << std::endl;
+    std::vector<double> eps = {1.5}; // You can have multiple eps values
+    int minPts = 1;
+
+    DBSCAN result = dbscan::run(Z, eps, minPts);
+
+    // Print the results
+    std::cout << "Clusters' IDs found: ";
+    for (int id : result.id) {
+        std::cout << id << " " ;
+    }
+    std::cout << std::endl;
+    /*
+    std::cout << result.c[0].size() << std::endl;
+    std::cout << result.c[1].size() << std::endl;
+    std::cout << result.c[2].size() << std::endl;
+     */
+    for(int i=0; i<result.c.size();i++){
+        std::cout << "The size of cluster " << i+1 << " is " << result.c[i].size() << std::endl;
+        std::cout << "The corresponding measurements are ";
+        for(int j=0; j<result.c[i].size();j++){
+            std::cout << result.c[i][j] << " ";
+        }
+        std::cout << std::endl;
     }
 }

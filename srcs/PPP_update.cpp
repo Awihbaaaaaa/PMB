@@ -1,32 +1,33 @@
 #include "../Headers/declarations.hpp"
 //#include "utilities.cpp"
 
-void updateUndetectedObjs(std::vector<UntrackedObj>& PPP,
+void updateUndetectedObjs(ObjectsCollection& PPP_objs,
                           radarDefinition* radar,
                           ExtendedObjectDefinition* extObj){
     double Pd = radar->getRadarDetectionProbability();
-    std::cout << PPP.size() << std::endl;
+    //std::cout << PPP_objs.PPP.size() << std::endl;
 
-    std::vector<UntrackedObj> tempPPP = PPP;
+    std::vector<UntrackedObj> tempPPP = PPP_objs.PPP;
+    /* 
     std::cout << "Obj 1" << ": alpha: " << PPP[0].alpha << " beta: " << PPP[0].beta << " weight: " << PPP[0].w_ppp << " " << PPP[0].X << std::endl;
     std::cout << "Obj 2" << ": alpha: " << PPP[1].alpha << " beta: " << PPP[1].beta << " weight: " << PPP[1].w_ppp << " " << PPP[1].X << std::endl;
     std::cout << "Obj 3" << ": alpha: " << PPP[2].alpha << " beta: " << PPP[2].beta << " weight: " << PPP[2].w_ppp << " " << PPP[2].X << std::endl;
     std::cout << "TempObj 1" << ": alpha: " << tempPPP[0].alpha << " beta: " << tempPPP[0].beta << " weight: " << tempPPP[0].w_ppp << " " << tempPPP[0].X << std::endl;
     std::cout << "TempObj 2" << ": alpha: " << tempPPP[1].alpha << " beta: " << tempPPP[1].beta << " weight: " << tempPPP[1].w_ppp << " " << tempPPP[1].X << std::endl;
     std::cout << "TempObj 3" << ": alpha: " << tempPPP[2].alpha << " beta: " << tempPPP[2].beta << " weight: " << tempPPP[2].w_ppp << " " << tempPPP[2].X << std::endl;
-    
+     */
     double PPP_threshold = extObj->getPPP_PruningThreshold();
     double updateWppp1 = 0; 
     double updateWppp2 = 0;
     int temp =0;
-    for(int i = PPP.size() - 1; i >= 0; --i){
-        updateWppp1 = (1 - Pd)*PPP[i].w_ppp;
+    for(int i = PPP_objs.PPP.size() - 1; i >= 0; --i){
+        updateWppp1 = (1 - Pd)*PPP_objs.PPP[i].w_ppp;
         if(updateWppp1 > PPP_threshold){
-            PPP[i].w_ppp = updateWppp1;
+            PPP_objs.PPP[i].w_ppp = updateWppp1;
         }else{
-            std::cout << "object erased." <<std::endl;
-            PPP.erase(PPP.begin() + i);
-            std::cout << PPP.size() << std::endl;
+            //std::cout << "object erased." <<std::endl;
+            PPP_objs.PPP.erase(PPP_objs.PPP.begin() + i);
+            //std::cout << PPP.size() << std::endl;
             temp++;
         }
 
@@ -35,21 +36,23 @@ void updateUndetectedObjs(std::vector<UntrackedObj>& PPP,
             tempPPP[i].w_ppp = updateWppp2;
             tempPPP[i].beta = tempPPP[i].beta + 1;
         }else{
-            std::cout << "temp object erased."<< std::endl;
+            //std::cout << "temp object erased."<< std::endl;
             tempPPP.erase(tempPPP.begin() + i);
         }
     }
-    std::cout << "Obj 1" << ": alpha: " << PPP[0].alpha << " beta: " << PPP[0].beta << " weight: " << PPP[0].w_ppp << " " << PPP[0].X << std::endl;
+    
+    /* std::cout << "Obj 1" << ": alpha: " << PPP[0].alpha << " beta: " << PPP[0].beta << " weight: " << PPP[0].w_ppp << " " << PPP[0].X << std::endl;
     std::cout << "Obj 2" << ": alpha: " << PPP[1].alpha << " beta: " << PPP[1].beta << " weight: " << PPP[1].w_ppp << " " << PPP[1].X << std::endl;
     std::cout << "Obj 3" << ": alpha: " << PPP[2].alpha << " beta: " << PPP[2].beta << " weight: " << PPP[2].w_ppp << " " << PPP[2].X << std::endl;
     std::cout << "TempObj 1" << ": alpha: " << tempPPP[0].alpha << " beta: " << tempPPP[0].beta << " weight: " << tempPPP[0].w_ppp << " " << tempPPP[0].X << std::endl;
     std::cout << "TempObj 2" << ": alpha: " << tempPPP[1].alpha << " beta: " << tempPPP[1].beta << " weight: " << tempPPP[1].w_ppp << " " << tempPPP[1].X << std::endl;
     std::cout << "TempObj 3" << ": alpha: " << tempPPP[2].alpha << " beta: " << tempPPP[2].beta << " weight: " << tempPPP[2].w_ppp << " " << tempPPP[2].X << std::endl;
-    combinePPPs(PPP, tempPPP);
-    std::cout << PPP.size() << std::endl;
-    std::cout << "Obj 1" << ": alpha: " << PPP[0].alpha << " beta: " << PPP[0].beta << " weight: " << PPP[0].w_ppp << " " << PPP[0].X << std::endl;
+     */
+    combinePPPs(PPP_objs.PPP, tempPPP);
+    //std::cout << PPP_objs.PPP.size() << std::endl;
+    //std::cout << "Obj 1" << ": alpha: " << PPP[0].alpha << " beta: " << PPP[0].beta << " weight: " << PPP[0].w_ppp << " " << PPP[0].X << std::endl;
 
-    if(PPP.empty()){
+    if(PPP_objs.PPP.empty()){
         std::cerr << "All the PPP components got pruned!\n " 
                   << "After update we prune PPP components with low weights."
                   << " If no new PPPs are added for the next recursion, we cant"
@@ -57,6 +60,50 @@ void updateUndetectedObjs(std::vector<UntrackedObj>& PPP,
                   << "Try changing initial weights of PPP or lowering Pd\n";
     }
 }
+
+void createNewMBs(ObjectsCollection& PPP_objs,
+                  measurements* CurrentMeasurements,
+                  radarDefinition* radar,
+                  ExtendedObjectDefinition* extObj){
+    double eps = radar->getEpsCluster();
+    int minNrPnts = radar->getMinNrPntsCluster();
+
+    // Local copy for the local ingating.
+    measurements localCopy = *CurrentMeasurements;
+
+    // To check which outgated measurements are located in the 
+    // PPP gate.
+    elipsoidalGating(radar, &PPP_objs, localCopy);
+    
+    /* 
+    The following loop is to extract measurements located in the gates.
+    Before the loop, the measurements are copied to RawMeasInsideGates.
+    We assume that all measurements are inside the gates. We loop then
+    over the matrix outGated. We take the index of the measurements located 
+    outside the gate, then this column is removed from RawMeasInsideGates.
+    To do that, two trackers are used. i to loop over outGated and measRemoved.
+    measRemoved will follow i if no measurements removed. If measurements are removed
+    measRemoved is decreased, because the RawMeasInsideGates is shrinked.
+    */
+    Matrix RawMeasInsideGates = *(CurrentMeasurements->z);
+    int measRemoved = 0;
+    
+    for(int i=0; i<localCopy.outGated.nrCols(); i++){
+        if(localCopy.outGated(0,i)==0){
+            RawMeasInsideGates.removeColumn(i);
+            measRemoved--;
+            continue;
+        }
+        measRemoved++;
+    }
+    /* 
+    std::cout << *(CurrentMeasurements->z);
+    std::cout << RawMeasInsideGates;
+     */
+    //dbscan(&RawMeasInsideGates, eps, minNrPnts);
+
+}
+
 
 /* 
 PPP_update will takes in a collection of objects, tracked and untracked.
@@ -79,8 +126,15 @@ void PPP_update(ObjectsCollection& collection,
                 measurements* currMeasurements,
                 radarDefinition* radar,
                 ExtendedObjectDefinition* extObj){
-                    updateUndetectedObjs(collection.PPP,
+                    updateUndetectedObjs(collection,
                                          radar,
                                          extObj);
+                    
+                    if(currMeasurements->z->nrCols() > 0){
+                        createNewMBs(collection,
+                                     currMeasurements,
+                                     radar,
+                                     extObj);
+                    }
 
                 };

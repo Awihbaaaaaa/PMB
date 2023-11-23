@@ -1,32 +1,46 @@
 #include <iostream>
-using namespace std;/* 
-#include <cmath> 
-#include <vector>
-#include <limits> */
+using namespace std;
 #include "Headers/declarations.hpp"
-//#include "Headers/ctModel.hpp"
-//#include "Headers/objectsStack.hpp"
-//#include "Headers/ExtendedObjectDefinition.hpp"
-//#include "Headers/radarDefinition.hpp"
 
-/* #include <fstream>
-#include <sstream>
-#include <string>
-#include <cassert>
- */
-//#include "Headers/obj.hpp"
 #define MIN_DOUBLE -std::numeric_limits<double>::max()
 #include <random>
 //#include <cmath>
 
 int main() {
+    TestDBSCAN();
+    /* Matrix Z(3,4);
+    Z = {{15.0, 2.0, 2.5, 10.0},
+        {50.0, 6.0, 7.0, 9.0},
+        {0.1, 0.2, 0.3, 0.4}};
+
+    std::vector<double> eps = {1.5}; // You can have multiple eps values
+    int minPts = 1;
+
+    DBSCANResult result = DBSCAN::run(Z, eps, minPts);
+
+    // Print the results
+    std::cout << "IDs: ";
+    for (int id : result.id) {
+        std::cout << id << " " ;
+    }
+    std::cout << std::endl;
+    std::cout << result.c[0].size() << std::endl;
+    std::cout << result.c[1].size() << std::endl;
+    std::cout << result.c[2].size() << std::endl;
+    
+    for(int i=0; i<result.c.size();i++){
+        for(int j=0; j<result.c[i].size();j++){
+            std::cout << result.c[i][j] << " ";
+        }
+        std::cout << std::endl;
+    } */
     // Motion model parameters
     double T = 0.1, sigmaV = 1.0, sigmav = M_PI/15; 
     ctModel motionModel(T,sigmaV, sigmav);
 
     // Extended object representation parameters
     double extentDim = 3, survivalProbability = 0.35, shapeUncertainty = 0.1;
-    double forgettingFactor = 8, ciClusteringThreshold = 1.5, minNrPnts= 3, objectsRate = 10;
+    double forgettingFactor = 8;
     double existanceThreshold = 0.3, PPP_pruningThreshold = 0.034, MB_pruningThreshold = 0.4;
     ExtendedObjectDefinition extendedObjDef(extentDim,
                                             motionModel,
@@ -38,22 +52,29 @@ int main() {
                                             MB_pruningThreshold);
 
     // Radar parameters
-    double detectionProbability = 0.9, gatingThreshold = 100, expectedObjects = 5, extentDegreesOfFreedom = 150, extentCov = 60;
+    double detectionProbability = 0.9, gatingThreshold = 100, ciClutterIntensity = 1.5;
+    double expectedObjects = 5, objectsRate = 10, extentDegreesOfFreedom = 150, extentCov = 60;
+
+    // Clustering parameters
+    double epsClusteringThreshold = 1.5, minNrPntsCluster = 1;
+
     ObjectsCollection testPPP = initPPP(expectedObjects, objectsRate, extentDegreesOfFreedom);
     radarDefinition radar(detectionProbability,
                           gatingThreshold,
-                          ciClusteringThreshold,
+                          ciClutterIntensity,
                           expectedObjects,
                           objectsRate,
                           extentDegreesOfFreedom,
-                          extentCov);
+                          extentCov,
+                          epsClusteringThreshold,
+                          minNrPntsCluster);
     
     cout << "Obj 1" << ": alpha: " << testPPP.PPP[0].alpha << " beta: " << testPPP.PPP[0].beta << " weight: " << testPPP.PPP[0].w_ppp << " " << testPPP.PPP[0].X << endl;
     cout << "Obj 2" << ": alpha: " << testPPP.PPP[1].alpha << " beta: " << testPPP.PPP[1].beta << " weight: " << testPPP.PPP[1].w_ppp << " " << testPPP.PPP[1].X << endl;
     cout << "Obj 3" << ": alpha: " << testPPP.PPP[2].alpha << " beta: " << testPPP.PPP[2].beta << " weight: " << testPPP.PPP[2].w_ppp << " " << testPPP.PPP[2].X << endl;
     
     // combineComponents(currentPPP, newPPP);
-    Matrix meas(3,10);
+    
     TrackedObj obj1;
     obj1.X.x = 1.1;
     obj1.X.y = 2.1;
@@ -66,14 +87,20 @@ int main() {
 
     testPPP.MB.push_back(obj2);
 
+    Matrix meas(3,10);
     meas = {{1.1, 1.0, 0.9, 7,  0.5,  12, -22.9, -23, -23.2}, 
             {2.1, 2.1, 2.0, 1, -0.5, -12,  22.9,  23,  23.2},
             {5  , 3  , -6 , 1,    2,   3,   1  ,  2 ,    5 }};
-    
+        
     
     predict(testPPP, extendedObjDef);
-    update(testPPP, &meas, &radar, &extendedObjDef);
+    /* std::cout << "The size of the predicted objets is: " << testPPP.PPP.size() << std::endl;
+    std::cout << testPPP.PPP[80].X; */
 
+    update(testPPP, &meas, &radar, &extendedObjDef);
+    /* std::cout << "The size of the updated objets is: " << testPPP.PPP.size();
+
+    std::cout << testPPP.PPP.size(); */
     /* ObjectsCollection Rad;
 
     double values[] = {MIN_DOUBLE,MIN_DOUBLE,MIN_DOUBLE,MIN_DOUBLE,MIN_DOUBLE};

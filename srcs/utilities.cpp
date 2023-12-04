@@ -24,7 +24,10 @@ ObjectsCollection initPPP(const double tot_exp_objs,
 
    double pnt = 0;
    double antObj = 3;
-   Matrix V(3,3);
+   Matrix V(3,3,0.0);
+   V(0,0) = 40;
+   V(1,1) = 45;
+   V(2,2) = 50;
 
    for (double ran = 2.5; ran <= 50; ran += 7.5) {
       for (double ang = -50; ang <= 50; ang += 100.0 / antObj) {
@@ -41,9 +44,17 @@ ObjectsCollection initPPP(const double tot_exp_objs,
                untrackedObj.w_ppp = 0.08;
             }
 
-            untrackedObj.P = Matrix(5, 5, 2.0) * Matrix::identity(5);
+            //untrackedObj.P = Matrix(5, 5, 2.0) * Matrix::identity(5);
+            untrackedObj.P = Matrix(5,5,0.0);
+            untrackedObj.P(0,0) = 2;
+            untrackedObj.P(1,1) = 5;
+            untrackedObj.P(2,2) = 3;
+            untrackedObj.P(3,3) = 0.7;
+            untrackedObj.P(4,4) = 0.1;
             untrackedObj.v = dof;
             untrackedObj.V = V;
+            untrackedObj.alpha = 1;
+            untrackedObj.beta = 1;
 
             collection.PPP.push_back(untrackedObj);
             pnt++;

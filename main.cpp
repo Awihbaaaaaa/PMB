@@ -7,7 +7,16 @@ using namespace std;
 //#include <cmath>
 
 int main() {
-    TestDBSCAN();
+    /* Matrix A(3, 3);
+    A ={{4, 12, -16},
+        {12, 37, -43},
+        {-16, -43, 98}};
+
+    // Perform Cholesky factorization
+    Matrix L = A.chol();
+
+    std::cout << "Original matrix A:\n" << A << "\n\n";
+    std::cout << "Lower triangular matrix L (Cholesky factorization):\n" << L << "\n\n"; */
     /* Matrix Z(3,4);
     Z = {{15.0, 2.0, 2.5, 10.0},
         {50.0, 6.0, 7.0, 9.0},
@@ -92,7 +101,8 @@ int main() {
             {2.1, 2.1, 2.0, 1, -0.5, -12,  22.9,  23,  23.2},
             {5  , 3  , -6 , 1,    2,   3,   1  ,  2 ,    5 }};
         
-    
+    std::cout << "Test mesurements are:" << std::endl;
+    std::cout << meas;
     predict(testPPP, extendedObjDef);
     /* std::cout << "The size of the predicted objets is: " << testPPP.PPP.size() << std::endl;
     std::cout << testPPP.PPP[80].X; */

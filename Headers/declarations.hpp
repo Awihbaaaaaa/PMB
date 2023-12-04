@@ -8,6 +8,7 @@
 #include <sstream>
 #include <string>
 #include <cassert>
+#include <numeric>
 
 // ctModel is inside extendedObjectDefinition
 #include "ExtendedObjectDefinition.hpp"
@@ -51,14 +52,27 @@ void update(ObjectsCollection& collection,
 
 class measurements{
     public:
-        Matrix* z;
+        const Matrix* z;
         Matrix inGated;
         Matrix outGated;
-        measurements(Matrix* measurements):z(measurements){};
+        measurements(const Matrix* measurements):z(measurements){};
+
+        measurements(const measurements& other)
+        : z(other.z), inGated(other.inGated), outGated(other.outGated) {}
+
+        measurements& operator=(const measurements& other) {
+            if (this != &other) {
+                z = other.z;
+                inGated = other.inGated;
+                outGated = other.outGated;
+            }
+            return *this;
+        }
 };
 
 void elipsoidalGating(radarDefinition* radar,
                       ObjectsCollection* objs,
+                      const char c,
                       measurements& currMeasurements);
 
 void PPP_update(ObjectsCollection& collection,
@@ -66,6 +80,23 @@ void PPP_update(ObjectsCollection& collection,
                 radarDefinition* radar,
                 ExtendedObjectDefinition* extObj);
 
+void newBernoulliBirth(ObjectsCollection& PPP_objs,
+                       Matrix* clusterMeas, 
+                       radarDefinition* radar, 
+                       ExtendedObjectDefinition* extObj);
+struct GGIW_result{
+    TrackedObj newMB;
+    double L;
+};
 
+GGIW_result ggiwUpdate(UntrackedObj* obj,
+                measurements* z,
+                radarDefinition* radar,
+                ExtendedObjectDefinition* object);
+
+
+void merge(ObjectsCollection& PPP_objs,
+          std::vector<TrackedObj>* newMBs,
+          ExtendedObjectDefinition* extObj);
 
 #endif

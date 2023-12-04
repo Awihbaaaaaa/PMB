@@ -3,21 +3,9 @@
 #include <stdexcept>
 #include <iomanip>
 #include "../Headers/Matrix.hpp"
+#include "../Headers/obj.hpp"
 #include <cmath>
 
-/* std::ostream& operator<<(std::ostream &os, const Matrix &m) {
-    int rows = m.nrRows();
-    int cols = m.nrCols();
-
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            os << m(i, j) << " ";
-        }
-        os << std::endl;
-    }
-
-    return os;
-} */
 std::ostream& operator<<(std::ostream& os, const Matrix& m) {
     int rows = m.nrRows();
     int cols = m.nrCols();
@@ -34,7 +22,6 @@ std::ostream& operator<<(std::ostream& os, const Matrix& m) {
 
     return os;
 }
-
 
 std::vector<std::vector<double>> Matrix::getData() const {
     return data;
@@ -114,30 +101,70 @@ Matrix Matrix::operator*(const Matrix& other) const{
         throw std::invalid_argument("Matrices dimensions doesn't match.");
     }
 
-    Matrix res(nrRows(), nrCols());
+    Matrix res(nrRows(), other.nrCols(), 0.0);
     double c = 0, r = 0, temp = 0;
-    for(int i = 0; i < nrRows(); i++){
-        for(int j = 0; j < nrCols(); j++){
-            for(c=0,r=0;r<nrRows(); c++,r++){
-                temp += data[i][c] * other(r,j);
+    for(int i = 0; i < this->nrRows(); i++){
+        for(int j = 0; j < other.nrCols(); j++){
+            double sum = 0.0;
+            for(int k=0; k< this->nrCols(); k++){
+                /* std::cout << "data at "<< i << ", " << k << " " << data[i][k] << std::endl;
+                std::cout << "other at "<< k << ", " << j << " " << other(k,j) << std::endl;
+                std::cout << data[i][k] * other(k,j) << std::endl; */
+                sum += this->data[i][k] * other(k,j);
+                //std::cout << sum << std::endl;
             }
-            res(i,j) = temp;
-            temp = 0;
+            res(i,j) = sum;
         }
     }
-
     return res;
 }
 
-/* Matrix Matrix::operator*(const double scaler) const{
-    Matrix res(nrRows(), nrCols());
-    for(int i = 0; i < nrRows(); i++){
-        for(int j = 0; j < nrCols(); j++){
-            res(i,j) = scaler * data[i][j];
+Matrix Matrix::operator*(const double scaler) const{
+    Matrix result(nrRows(), nrCols());
+
+    for(int i = 0; i<nrRows(); i++){
+        for(int j = 0; j<nrCols(); j++){
+            result(i,j) = data[i][j]*scaler;
         }
     }
-    return res;
-} */
+    return result;
+}
+
+Matrix Matrix::operator/(const double scaler) const {
+    if (scaler == 0.0) {
+        throw std::invalid_argument("Division by zero.");
+    }
+
+    Matrix result(nrRows(), nrCols());
+    for (int i = 0; i < nrRows(); ++i) {
+        for (int j = 0; j < nrCols(); ++j) {
+            result(i, j) = data[i][j] / scaler;
+        }
+    }
+    return result;
+}
+
+Matrix Matrix::operator*(const objStateSpace& obj) const {
+    Matrix result(3, 1);
+
+    result(0, 0) = this->data[0][0] * obj.x + this->data[0][1] * obj.y + this->data[0][2] * obj.v + this->data[0][3] * obj.theta + this->data[0][4] * obj.w;
+    result(1, 0) = this->data[1][0] * obj.x + this->data[1][1] * obj.y + this->data[1][2] * obj.v + this->data[1][3] * obj.theta + this->data[1][4] * obj.w;
+    result(2, 0) = this->data[2][0] * obj.x + this->data[2][1] * obj.y + this->data[2][2] * obj.v + this->data[2][3] * obj.theta + this->data[2][4] * obj.w;
+
+    return result;
+}
+
+Matrix Matrix::operator+(const objStateSpace& obj) const {
+    Matrix result(*this);  
+
+    result(0, 0) += obj.x;
+    result(1, 0) += obj.y;
+    result(2, 0) += obj.v;
+    result(3, 0) += obj.theta;
+    result(4, 0) += obj.w;
+
+    return result;
+}
 
 Matrix Matrix::operator+(const Matrix& other) const{
     if(nrRows() != other.nrRows() || nrCols() != other.nrCols()){
@@ -158,17 +185,22 @@ Matrix Matrix::operator+(const Matrix& other) const{
 }
 
 Matrix Matrix::operator-(const Matrix& other) const{
-    if(nrRows() != other.nrRows() || nrCols() != other.nrCols()){
+    if((nrRows() != other.nrRows() && ((nrCols() != other.nrCols()) || (nrCols() != 1) || (other.nrCols()!=1)))){
         std::cout << "The matrices dimensions don't match. Subtraction is not possible. Hit enter to exit.";
         std::cin.get();
         throw std::invalid_argument("Matrices dimensions doesn't match.");
     }
-
-    Matrix res(nrRows(), nrCols());
+    Matrix res(nrRows(), std::max(nrCols(),other.nrCols()));
 
     for(int i = 0; i < nrRows(); i++){
         for(int j = 0; j < nrCols(); j++){
-            res(i,j) = data[i][j] - other(i,j);
+            if (nrCols() == 1) {
+                res(i, j) = data[i][0] - other(i, j);
+            } else if (other.nrCols() == 1) {
+                res(i, j) = data[i][j] - other(i, 0);
+            } else {
+                res(i, j) = data[i][j] - other(i, j);
+            }
         }
     }
 
@@ -231,11 +263,15 @@ void Matrix::luDecomposition(Matrix& L, Matrix& U) const {
             // Calculate the sum of the products of elements in the lower triangular matrix L
             // and the upper triangular matrix U to find the elements of U
             for (int j = 0; j < i; j++) {
+                //std::cout << "L(" << i <<","<< j << ") is "<< L(i,j) << std::endl;
+                //std::cout << "U(" << j <<","<< k << ") is "<< U(j, k) << std::endl;
                 sum += (L(i, j) * U(j, k));
             }
-
+            //std::cout << "data[" << i << "," << k <<"] = " << data[i][k] << " and sum is " << sum << std::endl;
             // Compute the elements of the upper triangular matrix U
+            
             U(i, k) = data[i][k] - sum;
+            //std::cout << "U("<<i<<","<<k<<")="<<U(i,k)<<std::endl;
         }
 
         // Loop through columns of the lower triangular matrix
@@ -254,6 +290,7 @@ void Matrix::luDecomposition(Matrix& L, Matrix& U) const {
 
                 // Compute the elements of the lower triangular matrix L
                 L(k, i) = (data[k][i] - sum) / U(i, i);
+                //std::cout << L(k,i) << std::endl;
             }
         }
     }
@@ -291,9 +328,11 @@ double Matrix::determinant() const {
     Matrix L, U;
     luDecomposition(L, U);
 
+    const double singularityTolerance = 1e-25;
+
     // Singularity check
     for (int i = 0; i < n; i++) {
-        if (std::abs(U(i, i)) < 1e-10) {
+        if (std::abs(U(i, i)) < singularityTolerance) {
             std::cout << "The matrix is singular, determinant is 0" << std::endl;
             return 0.0;
         }
@@ -317,48 +356,6 @@ void Matrix::setColumn(int col, const Matrix& columnData) {
     }
 }
 
-/* Matrix Matrix::forwardSubstitution(const Matrix& L, const Matrix& b) {
-    int n = L.nrRows();
-    Matrix y(n, 1);
-
-    for (int i = 0; i < n; i++) {
-        double sum = 0.0;
-        for (int j = 0; j < i; j++) {
-            sum += L(i, j) * y(j, 0);
-        }
-        y(i, 0) = (b(i, 0) - sum) / L(i, i);
-    }
-
-    return y;
-}
-
-Matrix Matrix::backwardSubstitution(const Matrix& U, const Matrix& b) {
-    int n = U.nrRows();
-    Matrix x(n, 1);
-
-    for (int i = n - 1; i >= 0; i--) {
-        double sum = 0.0;
-        for (int j = i + 1; j < n; j++) {
-            sum += U(i, j) * x(j, 0);
-        }
-        x(i, 0) = (b(i, 0) - sum) / U(i, i);
-    }
-
-    return x;
-}
-
-
-void Matrix::setColumn(int col, const Matrix& columnData) {
-    if (col >= nrCols() || columnData.nrRows() != nrRows() || columnData.nrCols() != 1) {
-        // Handle invalid input or dimension mismatch
-        throw std::invalid_argument("Invalid column or dimension mismatch");
-    }
-
-    for (int i = 0; i < nrRows(); i++) {
-        data[i][col] = columnData(i, 0);
-    }
-}
-*/
 Matrix Matrix::getColumn(int col) const {
     int n = nrRows();
     if (col < 0 || col >= nrCols()) {
@@ -400,43 +397,6 @@ void Matrix::removeColumn(int col){
     resize(nrRows(), nrCols()-1);
 }
 
-/*
-Matrix Matrix::inv() {
-    int n = nrRows();
-    if (n != nrCols()) {
-        std::cout << "The matrix doesn't have an inverse, not a square matrix. Press enter to exit!";
-        std::cin.get();
-        throw std::runtime_error("Determinant is defined only for square matrices.");
-    }
-
-    // Perform LU decomposition
-    Matrix L, U;
-    luDecomposition(L, U);
-
-    // Initialize identity matrix I
-    Matrix I(n, n);
-    for (int i = 0; i < n; i++) {
-        I(i, i) = 1.0;
-    }
-
-    // Initialize the inverse matrix
-    Matrix inverse(n, n);
-
-    // Forward Substitution: Solve Ly = I
-    for (int j = 0; j < n; j++) {
-        Matrix y = forwardSubstitution(L, I.getColumn(j));
-        inverse.setColumn(j, y);
-    }
-
-    // Backward Substitution: Solve Ux = y
-    for (int j = 0; j < n; j++) {
-        Matrix x = backwardSubstitution(U, inverse.getColumn(j));
-        inverse.setColumn(j, x);
-    }
-
-    return inverse;
-} */
-
 Matrix Matrix::inv(){
     int n = nrRows();
     if (n != nrCols()) {
@@ -458,36 +418,51 @@ Matrix Matrix::inv(){
         }
     }
 
-    // Forward Substitution for lower triangular
-    // Ly = I
-    // y0 = I0/L00
-    // y1 = (I1 - L10*y0)/L11
-    // I is the identitiy matrix
     Matrix I(n, n);
     for (int i = 0; i < n; i++) {
         I(i, i) = 1.0;
     }
 
-    Matrix inverse(n, n);
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            inverse(i, j) = I(i, j);
-            for (int k = 0; k < i; k++) {
-                inverse(i, j) -= L(i, k) * inverse(k, j);  // Corrected index here
-            }
-        }
-    }
+    Matrix Y = forwardSubstitution(L, I);
 
-    for (int i = n - 1; i >= 0; i--) {
-        for (int j = 0; j < n; j++) {
-            for (int k = i + 1; k < n; k++) {
-                inverse(i, j) -= U(i, k) * inverse(k, j);  // Corrected index here
-            }
-            inverse(i, j) /= U(i, i);
-        }
-    }
+    // Backward Substitution for upper triangular matrix U: Ux = Y
+    Matrix inverse = backwardSubstitution(U, Y);
 
     return inverse;
+}
+
+Matrix Matrix::forwardSubstitution(const Matrix& L, const Matrix& B) const {
+    int n = L.nrRows();
+    Matrix Y(n, B.nrCols(), 0.0);
+
+    for (int j = 0; j < B.nrCols(); j++) {
+        for (int i = 0; i < n; i++) {
+            Y(i, j) = B(i, j);
+            for (int k = 0; k < i; k++) {
+                Y(i, j) -= L(i, k) * Y(k, j);
+            }
+            Y(i, j) /= L(i, i);
+        }
+    }
+
+    return Y;
+}
+
+Matrix Matrix::backwardSubstitution(const Matrix& U, const Matrix& B) const {
+    int n = U.nrRows();
+    Matrix X(n, B.nrCols(), 0.0);
+
+    for (int j = 0; j < B.nrCols(); j++) {
+        for (int i = n - 1; i >= 0; i--) {
+            X(i, j) = B(i, j);
+            for (int k = i + 1; k < n; k++) {
+                X(i, j) -= U(i, k) * X(k, j);
+            }
+            X(i, j) /= U(i, i);
+        }
+    }
+
+    return X;
 }
 
 Matrix Matrix::sumRows() const{
@@ -505,3 +480,65 @@ Matrix Matrix::sumRows() const{
 
     return result;
 }
+
+Matrix Matrix::mean(int dim) const {
+    if (dim < 1 || dim > 2) {
+        throw std::invalid_argument("Invalid dimension. Valid dimensions are 1 (mean along rows) or 2 (mean along columns).");
+    }
+
+    int rows = nrRows();
+    int cols = nrCols();
+
+    // Calculate mean along rows (dimension 1)
+    if (dim == 1) {
+        Matrix result(1, cols, 0.0);
+        for (int col = 0; col < cols; ++col) {
+            for (int row = 0; row < rows; ++row) {
+                result(0, col) += data[row][col];
+            }
+            result(0, col) /= static_cast<double>(rows);
+        }
+        return result;
+    }
+    // Calculate mean along columns (dimension 2)
+    else {
+        Matrix result(rows, 1, 0.0);
+        for (int row = 0; row < rows; ++row) {
+            for (int col = 0; col < cols; ++col) {
+                result(row, 0) += data[row][col];
+            }
+            result(row, 0) /= static_cast<double>(cols);
+        }
+        return result;
+    }
+}
+
+Matrix Matrix::chol(){
+    int n = nrRows();
+
+    if (n != nrCols()) {
+        throw std::runtime_error("Cholesky factorization is defined only for square matrices.");
+    }
+
+    Matrix chol(this->nrRows(), this->nrCols(), 0.0);
+    
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j <= i; j++) {
+            double sum = 0.0;
+            if (i == j) {
+                for (int k = 0; k < j; k++) {
+                    sum += chol(i, k) * chol(i, k);
+                }
+                chol(i, j) = std::sqrt(data[i][i] - sum);
+            } else {
+                for (int k = 0; k < j; k++) {
+                    sum += chol(i, k) * chol(j, k);
+                }
+                //std::cout << (1.0 / chol(j, j)) * (data[i][j] - sum) << std::endl;
+                chol(i, j) = (1.0 / chol(j, j)) * (data[i][j] - sum);
+            }
+        }
+    }
+    return chol;
+}
+

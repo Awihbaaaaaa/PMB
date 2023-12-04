@@ -80,3 +80,9 @@ DBSCAN dbscan::run(const Matrix& Z, const std::vector<double>& eps, int minPts) 
     }
     return result;
 }
+
+std::ostream& operator<<(std::ostream &os, const DBSCAN &dbscanResult){
+    for (int i : dbscanResult.id) {
+        std::cout << i << " " ;
+    }
+};

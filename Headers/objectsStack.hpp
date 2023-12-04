@@ -1,11 +1,11 @@
 #ifndef OBJECTSSTACK_HPP
 #define OBJECTSSTACK_HPP
 #include <iostream>
-
-/*
+#include "obj.hpp"
+/* 
 The following class includes a definition of an object.
 Each object includes coordinates on x,y axes, velocity value v, heading theta, an angular velocity w as well as a pointer to the next object.
-*/
+*//*
 class objStateSpace{
     public:
         double x;
@@ -24,7 +24,7 @@ class objStateSpace{
     objStateSpace() : x(0.0), y(0.0), v(0.0), theta(0.0), w(0.0), nextObj(nullptr) {};
 
     friend std::ostream& operator<<(std::ostream &os, const objStateSpace &obj);  
-};
+}; */
 
 /* 
 The following class is a stack for storing the objects. It includes implementations 

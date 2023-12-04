@@ -19,6 +19,8 @@ struct DBSCAN {
     // The number of columns indicates how many points do we have at each cluster
     // The values in c represent the columns corresponds to the respective cluster
     std::vector<std::vector<int>> c;
+
+    friend std::ostream& operator<<(std::ostream &os, const DBSCAN &dbscanResult);
 };
 
 class dbscan {

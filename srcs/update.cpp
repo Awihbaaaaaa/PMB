@@ -14,6 +14,7 @@
 
 /* void elipsoidalGating(radarDefinition* radar,
                       std::vector<TrackedObj>* MB,
+                      const char c,
                       measurements& currMeasurements){
     int rows = currMeasurements.z->nrRows();
     int cols = currMeasurements.z->nrCols();
@@ -72,6 +73,8 @@
     }
 } */
 
+
+
 void update(ObjectsCollection& collection,
             Matrix* data,
             radarDefinition* radar,
@@ -79,7 +82,7 @@ void update(ObjectsCollection& collection,
 
                 measurements currentMeasurements(data);
                 std::vector<TrackedObj> tempppppp = collection.MB;
-                elipsoidalGating(radar, &collection, currentMeasurements);
+                elipsoidalGating(radar, &collection,'M', currentMeasurements);
                /*  
                std::cout <<currentMeasurements.inGated;
                std::cout <<currentMeasurements.outGated; 

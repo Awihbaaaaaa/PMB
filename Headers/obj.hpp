@@ -3,7 +3,7 @@
 //#include "objectsStack.hpp"
 #include "Matrix.hpp"
 
-class objStateSpace{
+struct objStateSpace{
     public:
         double x;
         double y;
@@ -20,8 +20,26 @@ class objStateSpace{
                                 nextObj(nullptr) {};
     objStateSpace() : x(0.0), y(0.0), v(0.0), theta(0.0), w(0.0), nextObj(nullptr) {};
 
-    friend std::ostream& operator<<(std::ostream &os, const objStateSpace &obj);  
+    //friend std::ostream& operator<<(std::ostream &os, const objStateSpace &obj);  
+    friend std::ostream& operator<<(std::ostream &os, const objStateSpace &obj){
+        std::cout << "x = " << obj.x << ",y = " << obj.y << ", v = " << obj.v << ", theta = " << obj.theta << ",w = " << obj.w << std::endl;
+    }
+    
 };
+
+inline objStateSpace operator+(const objStateSpace& obj, const Matrix& mat) {
+    objStateSpace result;
+
+    result.x = obj.x + mat(0, 0);
+    result.y = obj.y + mat(1, 0);
+    result.v = obj.v + mat(2, 0);
+    result.theta = obj.theta + mat(3, 0);
+    result.w = obj.w + mat(4, 0);
+
+    // Assuming nextObj should also be handled, add the necessary code here
+
+    return result;
+}
 
 class UntrackedObj{
     public:

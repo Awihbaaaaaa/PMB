@@ -65,15 +65,25 @@ void createNewMBs(ObjectsCollection& PPP_objs,
                   measurements* CurrentMeasurements,
                   radarDefinition* radar,
                   ExtendedObjectDefinition* extObj){
-    double eps = radar->getEpsCluster();
+    std::vector<double> eps = {radar->getEpsCluster()};
     int minNrPnts = radar->getMinNrPntsCluster();
 
     // Local copy for the local ingating.
     measurements localCopy = *CurrentMeasurements;
+    /* localCopy.outGated = CurrentMeasurements->outGated;
+    localCopy.inGated = CurrentMeasurements->inGated;
+    std::cout << "\n CurrentMeasurements -> z is \n";
+    std::cout << *(CurrentMeasurements->z);
+    std::cout << "Local copy z\n";
+    std::cout << *(localCopy.z);
+    std::cout << "CurrentMeasurements outgated:\n"; 
+    std::cout << CurrentMeasurements->outGated;
+    std::cout << "localCopy outgated:\n";
+    std::cout << localCopy.outGated; */
 
     // To check which outgated measurements are located in the 
     // PPP gate.
-    elipsoidalGating(radar, &PPP_objs, localCopy);
+    elipsoidalGating(radar, &PPP_objs,'P', localCopy);
     
     /* 
     The following loop is to extract measurements located in the gates.
@@ -87,20 +97,50 @@ void createNewMBs(ObjectsCollection& PPP_objs,
     */
     Matrix RawMeasInsideGates = *(CurrentMeasurements->z);
     int measRemoved = 0;
-    
+    //std::cout << RawMeasInsideGates;
+
+    //std::cout << localCopy.outGated;
     for(int i=0; i<localCopy.outGated.nrCols(); i++){
+        //std::cout << localCopy.outGated(0,i) << "\n";
         if(localCopy.outGated(0,i)==0){
-            RawMeasInsideGates.removeColumn(i);
-            measRemoved--;
+            //std::cout << "RawMeasInsideGates " << RawMeasInsideGates.nrCols() << ", column "<< measRemoved << "\n";
+            RawMeasInsideGates.removeColumn(measRemoved);
+            //measRemoved--;
+            //std::cout << RawMeasInsideGates;
             continue;
         }
         measRemoved++;
+        
     }
-    /* 
-    std::cout << *(CurrentMeasurements->z);
+    std::cout << "Meas ingate:\n";
     std::cout << RawMeasInsideGates;
-     */
-    //dbscan(&RawMeasInsideGates, eps, minNrPnts);
+
+    DBSCAN result = dbscan::run(RawMeasInsideGates, eps, minNrPnts);
+    std::cout << result;
+    std::cout << std::endl;
+
+    /* 
+    New Bernoulli Birth:
+    In the following part, the likelihood that we will get new objects will 
+    be calculated.
+    */
+   // Check that we have any measurement that belong to a cluster
+    if(!result.id.empty()){
+        // Loop over the clusters
+        for(std::vector<int> row:result.c){
+            //Extract measurements belong to each cluster
+            Matrix clusterMeasurements(3,row.size(),0.0);
+            for(int i=0; i<row.size(); i++){
+                clusterMeasurements.setColumn(i,RawMeasInsideGates.getColumn(row[i]));
+            }
+            // Find the probability of new births
+            newBernoulliBirth(PPP_objs,
+                              &clusterMeasurements,
+                              radar,
+                              extObj);
+        }
+    }
+
 
 }
 

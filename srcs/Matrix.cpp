@@ -6,6 +6,16 @@
 #include "../Headers/obj.hpp"
 #include <cmath>
 
+Matrix::Matrix(objStateSpace obj):data(5, std::vector<double>(1)){
+    data[0][0] = obj.x;
+    std::cout << obj.y << "\n";
+    data[1][0] = obj.y;
+    std::cout << data[0][1];
+    data[2][0] = obj.v;
+    data[3][0] = obj.theta;
+    data[4][0] = obj.w;
+}
+
 std::ostream& operator<<(std::ostream& os, const Matrix& m) {
     int rows = m.nrRows();
     int cols = m.nrCols();
@@ -129,6 +139,19 @@ Matrix Matrix::operator*(const double scaler) const{
     }
     return result;
 }
+
+Matrix operator*(const double scaler, const Matrix& matrix) {
+    Matrix result(matrix.nrRows(), matrix.nrCols());
+
+    for (int i = 0; i < matrix.nrRows(); i++) {
+        for (int j = 0; j < matrix.nrCols(); j++) {
+            result(i, j) = matrix(i, j) * scaler;
+        }
+    }
+
+    return result;
+}
+
 
 Matrix Matrix::operator/(const double scaler) const {
     if (scaler == 0.0) {
@@ -465,20 +488,47 @@ Matrix Matrix::backwardSubstitution(const Matrix& U, const Matrix& B) const {
     return X;
 }
 
-Matrix Matrix::sumRows() const{
+/**
+ * @brief Calculate the sum of all elements in one dimension of the matrix.
+ *
+ * This function computes the sum of all rows/columns in the matrix based on the parameter given.
+ * It takes a parameter 'par' that can be used to specify if the requied sum should be through rows or columns.
+ *
+ * @param par A that controls the summation process.
+ *            Use 1 if the sum should be done on rows.
+ *            Use 2 if the sum should be done on rows.
+ *            Otherwise, invalid argument.
+ *
+ * @return A matrix of size 1xnrCols() if the sum performes on rows.
+ *         A matrix of size nrRows()x1 if the sum performes on cols.
+ */
+Matrix Matrix::sum(int par) const{
     if (data.empty() || data[0].empty()) {
         return Matrix();
     }
 
-    Matrix result(1, nrCols(), 0.0);
+    if(par == 1){
+        Matrix result(1, nrCols(), 0.0);
 
-    for (int col = 0; col < nrCols(); ++col) {
-        for (int row = 0; row < nrRows(); ++row) {
-            result(0, col) += data[row][col];
+        for (int col = 0; col < nrCols(); ++col) {
+            for (int row = 0; row < nrRows(); ++row) {
+                result(0, col) += data[row][col];
+            }
         }
-    }
+        return result;
+    }else if(par == 2){
+        Matrix result(nrRows(), 1, 0.0);
 
-    return result;
+        for (int row = 0; row < nrRows(); ++row) {
+            for (int col = 0; col < nrCols(); ++col) {
+                result(row, 0) += data[row][col];
+            }
+        }
+        return result;
+    }else{
+        throw std::invalid_argument("Invalid argument. Please choose 1 or 2.");
+    }
+    
 }
 
 Matrix Matrix::mean(int dim) const {

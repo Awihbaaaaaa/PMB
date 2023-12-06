@@ -1,8 +1,9 @@
-#include "../Headers/obj.hpp"
+/* #include "../Headers/obj.hpp"
 #include <cmath>
-#include "../Headers/ExtendedObjectDefinition.hpp"
+#include "../Headers/ExtendedObjectDefinition.hpp" */
+#include "../Headers/declarations.hpp"
 
-Matrix operator*(const double scaler, const Matrix& matrix){
+/* Matrix operator*(const double scaler, const Matrix& matrix){
     Matrix res(matrix.nrRows(), matrix.nrCols());
 
     for(int i = 0; i < matrix.nrRows(); i++){
@@ -12,7 +13,7 @@ Matrix operator*(const double scaler, const Matrix& matrix){
     }
     return res;
 }
-
+ */
 void predictPPP(std::vector<TrackedObj>& PPP, ExtendedObjectDefinition extendedObjDef);
 void predictMB(std::vector<TrackedObj>& PPP, ExtendedObjectDefinition extendedObjDef);
 

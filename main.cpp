@@ -78,22 +78,22 @@ int main() {
                           epsClusteringThreshold,
                           minNrPntsCluster);
     
-    cout << "Obj 1" << ": alpha: " << testPPP.PPP[0].alpha << " beta: " << testPPP.PPP[0].beta << " weight: " << testPPP.PPP[0].w_ppp << " " << testPPP.PPP[0].X << endl;
+    /* cout << "Obj 1" << ": alpha: " << testPPP.PPP[0].alpha << " beta: " << testPPP.PPP[0].beta << " weight: " << testPPP.PPP[0].w_ppp << " " << testPPP.PPP[0].X << endl;
     cout << "Obj 2" << ": alpha: " << testPPP.PPP[1].alpha << " beta: " << testPPP.PPP[1].beta << " weight: " << testPPP.PPP[1].w_ppp << " " << testPPP.PPP[1].X << endl;
     cout << "Obj 3" << ": alpha: " << testPPP.PPP[2].alpha << " beta: " << testPPP.PPP[2].beta << " weight: " << testPPP.PPP[2].w_ppp << " " << testPPP.PPP[2].X << endl;
-    
+     */
     // combineComponents(currentPPP, newPPP);
     
     TrackedObj obj1;
     obj1.X.x = 1.1;
     obj1.X.y = 2.1;
-
+    std::cout << "Obj1:\n" << obj1.X; 
     testPPP.MB.push_back(obj1);
 
     TrackedObj obj2;
     obj2.X.x = -23;
     obj2.X.y = 23;
-
+    std::cout << "Obj2:\n" << obj2.X ;
     testPPP.MB.push_back(obj2);
 
     Matrix meas(3,10);

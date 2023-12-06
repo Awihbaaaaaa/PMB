@@ -95,7 +95,7 @@ GGIW_result ggiwUpdate(UntrackedObj* obj,
                 ExtendedObjectDefinition* object);
 
 
-void merge(ObjectsCollection& PPP_objs,
+TrackedObj merge(std::vector<UntrackedObj>* PPP_objs,
           std::vector<TrackedObj>* newMBs,
           ExtendedObjectDefinition* extObj);
 

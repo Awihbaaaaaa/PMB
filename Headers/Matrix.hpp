@@ -16,11 +16,14 @@ class Matrix{
         Matrix(int rows, int cols, double val = 0.0):data(rows, std::vector<double>(cols, val)){}
         
         Matrix():data(0, std::vector<double>(0, 0.0)){};
+
+        Matrix(objStateSpace obj);
+        
         int nrRows() const;
         int nrCols() const;        
 
         Matrix inv();
-        Matrix sumRows() const;
+        Matrix sum(int par) const;
         Matrix backwardSubstitution(const Matrix& U, const Matrix& b) const;
         Matrix forwardSubstitution(const Matrix& L, const Matrix& B) const ;
         void resize(int newRows, int cols);
@@ -55,5 +58,6 @@ class Matrix{
         
         friend std::ostream& operator<<(std::ostream &os, const Matrix &m);
 };
+Matrix operator*(const double scaler, const Matrix& matrix);
 
 #endif

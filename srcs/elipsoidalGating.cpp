@@ -67,7 +67,7 @@ void elipsoidalGating(radarDefinition* radar,
     }
 
     //std::cout << measInGate;
-    Matrix sumRows = measInGate.sumRows();
+    Matrix sumRows = measInGate.sum(1);
     //Matrix measOutGate(1,measInGate.nrCols());
     //// SUM ROWS WILL RETURN HOW MANY MEAS WE HAVE, 0 -> outgate, 2 -> ingate
     /* std::cout << sumRows;

@@ -80,13 +80,15 @@ void update(ObjectsCollection& collection,
             radarDefinition* radar,
             ExtendedObjectDefinition* extObj){
 
-                measurements currentMeasurements(data);
-                std::vector<TrackedObj> tempppppp = collection.MB;
-                elipsoidalGating(radar, &collection,'M', currentMeasurements);
-               /*  
-               std::cout <<currentMeasurements.inGated;
-               std::cout <<currentMeasurements.outGated; 
-               */
+               measurements currentMeasurements(data);
+               std::vector<TrackedObj> tempppppp = collection.MB;
+               elipsoidalGating(radar, &collection,'M', currentMeasurements);
+               std::cout << "Possibly ingated Measurements:\n";
+               std::cout << currentMeasurements.inGated;
+
+               std::cout << "The indices of zero are possibly outgated Measurements:\n";
+               std::cout << currentMeasurements.outGated; 
+              
                 
                 PPP_update(collection,
                            &currentMeasurements,

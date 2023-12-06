@@ -65,26 +65,55 @@ void createNewMBs(ObjectsCollection& PPP_objs,
                   measurements* CurrentMeasurements,
                   radarDefinition* radar,
                   ExtendedObjectDefinition* extObj){
+    /*
+    CurrentMeasurements includes measurements around MBs
+    */
     std::vector<double> eps = {radar->getEpsCluster()};
     int minNrPnts = radar->getMinNrPntsCluster();
 
     // Local copy for the local ingating.
-    measurements localCopy = *CurrentMeasurements;
-    /* localCopy.outGated = CurrentMeasurements->outGated;
-    localCopy.inGated = CurrentMeasurements->inGated;
-    std::cout << "\n CurrentMeasurements -> z is \n";
+    measurements localCopy = *CurrentMeasurements;/* 
+    localCopy.outGated = CurrentMeasurements->outGated;
+    localCopy.inGated = CurrentMeasurements->inGated; */
+    /* std::cout << "\n CurrentMeasurements -> z is \n";
     std::cout << *(CurrentMeasurements->z);
     std::cout << "Local copy z\n";
     std::cout << *(localCopy.z);
     std::cout << "CurrentMeasurements outgated:\n"; 
     std::cout << CurrentMeasurements->outGated;
     std::cout << "localCopy outgated:\n";
-    std::cout << localCopy.outGated; */
+    std::cout << localCopy.outGated;
+    std::cout << "localCopy ingated:\n";
+    std::cout << localCopy.inGated; */
+
+    // We should extract the measurements that are outgated.
+    int measRemoved = 0;
+    //std::cout << *(localCopy.z);
+
+    //std::cout << localCopy.outGated;
+    // outgated raw measurements
+    Matrix ogrm = *(localCopy.z);
+    for(int i=0; i<localCopy.outGated.nrCols(); i++){
+        //std::cout << localCopy.outGated(0,i) << "\n";
+        if(localCopy.outGated(0,i)!=0){
+            //std::cout << "RawMeasInsideGates " << RawMeasInsideGates.nrCols() << ", column "<< measRemoved << "\n";
+            ogrm.removeColumn(measRemoved);
+            
+            //measRemoved--;
+            //std::cout << ogrm;
+            continue;
+        }
+        measRemoved++;
+    }
 
     // To check which outgated measurements are located in the 
     // PPP gate.
-    elipsoidalGating(radar, &PPP_objs,'P', localCopy);
+    measurements ogrmMeas(&ogrm);
+    elipsoidalGating(radar, &PPP_objs,'P', ogrmMeas);
     
+    /* std::cout << *(ogrmMeas.z);
+    std::cout << ogrmMeas.inGated;
+    std::cout << ogrmMeas.outGated; */
     /* 
     The following loop is to extract measurements located in the gates.
     Before the loop, the measurements are copied to RawMeasInsideGates.
@@ -96,7 +125,7 @@ void createNewMBs(ObjectsCollection& PPP_objs,
     measRemoved is decreased, because the RawMeasInsideGates is shrinked.
     */
     Matrix RawMeasInsideGates = *(CurrentMeasurements->z);
-    int measRemoved = 0;
+    measRemoved = 0;
     //std::cout << RawMeasInsideGates;
 
     //std::cout << localCopy.outGated;
@@ -110,10 +139,9 @@ void createNewMBs(ObjectsCollection& PPP_objs,
             continue;
         }
         measRemoved++;
-        
     }
-    std::cout << "Meas ingate:\n";
-    std::cout << RawMeasInsideGates;
+    /* std::cout << "Meas ingate:\n";
+    std::cout << RawMeasInsideGates; */
 
     DBSCAN result = dbscan::run(RawMeasInsideGates, eps, minNrPnts);
     std::cout << result;
@@ -166,6 +194,11 @@ void PPP_update(ObjectsCollection& collection,
                 measurements* currMeasurements,
                 radarDefinition* radar,
                 ExtendedObjectDefinition* extObj){
+                    /*
+                    currMeasurements is a struct that includes the raw measurements data
+                    a matrix ingated that includes measurements located inside the gates around MBs
+                    a matrix for outgated measurements
+                    */
                     updateUndetectedObjs(collection,
                                          radar,
                                          extObj);

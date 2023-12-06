@@ -24,7 +24,40 @@ struct objStateSpace{
     friend std::ostream& operator<<(std::ostream &os, const objStateSpace &obj){
         std::cout << "x = " << obj.x << ",y = " << obj.y << ", v = " << obj.v << ", theta = " << obj.theta << ",w = " << obj.w << std::endl;
     }
-    
+
+    objStateSpace operator+(const objStateSpace& other){
+        objStateSpace result;
+
+        result.x = this->x + other.x;
+        result.y = this->y + other.y;
+        result.v = this->v + other.v;
+        result.theta = this->theta + other.theta;
+        result.w = this->w + other.w;
+
+        return result;
+    }
+
+    objStateSpace operator-(const objStateSpace& other){
+        objStateSpace result;
+
+        result.x = this->x - other.x;
+        result.y = this->y - other.y;
+        result.v = this->v - other.v;
+        result.theta = this->theta - other.theta;
+        result.w = this->w - other.w;
+
+        return result;
+    }
+
+    /* Matrix operator*(const objStateSpace& obj){
+        Matrix result(5,5,0.0);
+
+        for(int i = 0; i<5;i++){
+            for(int j = 0; j<5; j++){
+                result(i,j) = 
+            }
+        }
+    }   */
 };
 
 inline objStateSpace operator+(const objStateSpace& obj, const Matrix& mat) {

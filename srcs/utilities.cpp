@@ -2,14 +2,22 @@
 #include <random>
 #include <cmath>
 
-/* ObjectsCollection initPPP(const double tot_exp_objs,
-                        const double objs_rate,
-                        const double dof); */
-
+/**
+ * @brief Converts an angle from degrees to radians.
+ * @param degrees The angle in degrees.
+ * @return The angle in radians.
+ */
 double deg2rad(double degrees) {
    return degrees * M_PI / 180.0;
 }
 
+
+/**
+ * @brief Generates a random number within the specified interval [min, max].
+ * @param min The minimum value of the interval.
+ * @param max The maximum value of the interval.
+ * @return A random number within the specified interval.
+ */
 double genRanNr(double min, double max){
    std::random_device rd;
    std::mt19937 gen(rd());
@@ -17,6 +25,13 @@ double genRanNr(double min, double max){
    return distribution(gen);
 }
 
+/**
+ * @brief Initializes a collection of potential objects in the sensor field of view (PPP).
+ * @param tot_exp_objs Total expected objects in the field of view.
+ * @param objs_rate Object creation rate.
+ * @param dof The degree of freedom parameter for the inverse Wishart distribution.
+ * @return The collection of potential objects.
+ */
 ObjectsCollection initPPP(const double tot_exp_objs,
                         const double objs_rate,
                         const double dof) {
@@ -66,10 +81,20 @@ ObjectsCollection initPPP(const double tot_exp_objs,
 }
 
 
+/**
+ * @brief Combines two sets of untracked objects (PPP).
+ * @param PPP The first set of untracked objects.
+ * @param newPPP The second set of untracked objects to be added.
+ */
 void combinePPPs(std::vector<UntrackedObj>& PPP, std::vector<UntrackedObj> newPPP){
     PPP.insert(PPP.end(), newPPP.begin(), newPPP.end());
 }
 
+/**
+ * @brief Combines two sets of tracked objects (MB).
+ * @param MB The first set of tracked objects.
+ * @param newMB The second set of tracked objects to be added.
+ */
 void combineMBs(std::vector<TrackedObj>& MB, std::vector<TrackedObj> newMB){
    MB.insert(MB.end(), newMB.begin(), newMB.end());
 }

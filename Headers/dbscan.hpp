@@ -2,22 +2,16 @@
 #define DBSCAN_HPP
 
 #include "Matrix.hpp"  
-/* 
-   DBSCAN is a clustering algorithm for identifying dense regions in spatial data. It categorizes
-   points as core, border, or noise, based on the density of their neighborhoods. The algorithm is
-   effective for discovering clusters of varying shapes and handling noisy data.
-   The input parameters are:
-    Z -> A matrix that include the raw sensor data.
-    eps -> A parameter that decide the minimum distance allowed to consider a point as part of cluster
-    nrPnts -> minimum number of points allowed in a single cluster.
-*/
+
 struct DBSCAN {
-    // if id(i) = 0 -> Z(i) is clutter.
     std::vector<int> id;
 
-    // C i two dimensional array. The number of rows indicates how many clusters we have
-    // The number of columns indicates how many points do we have at each cluster
-    // The values in c represent the columns corresponds to the respective cluster
+    /* C is a two-dimensional array for cluster information.
+    *
+    * This array is used to store cluster information where the number of rows indicates the total number of clusters,
+    * and the number of columns represents the count of points in each respective cluster. The values in the array correspond
+    * to the columns associated with the specific cluster.
+    */
     std::vector<std::vector<int>> c;
 
     friend std::ostream& operator<<(std::ostream &os, const DBSCAN &dbscanResult);
@@ -25,6 +19,19 @@ struct DBSCAN {
 
 class dbscan {
 public:
+    /**
+     * @brief Run the DBSCAN clustering algorithm on the provided spatial data.
+     *
+     * This static method applies the DBSCAN algorithm to identify clusters in spatial data. It takes a matrix of raw sensor data,
+     * a vector specifying the minimum distance allowed (eps) for considering points as part of a cluster, and an integer specifying
+     * the minimum number of points (minPts) required to form a cluster.
+     *
+     * @param Z A Matrix representing the raw sensor data.
+     * @param eps A vector of doubles specifying the minimum distance allowed for considering points as part of a cluster.
+     * @param minPts An integer representing the minimum number of points required to form a cluster.
+     *
+     * @return A DBSCAN structure containing the cluster assignments and indices of points in each cluster.
+     */
     static DBSCAN run(const Matrix& Z, const std::vector<double>& eps, int minPts);
 };
 

@@ -2,6 +2,18 @@
 #include <tgmath.h>
 #include "../Headers/declarations.hpp"
 
+/**
+ * @brief Perform a Gaussian-Gamma Inverse Wishart (GGIW) update on a single object.
+ *
+ * The function updates the state estimate of an object state space using a joint distribution called Gaussian-Gamma Inverse Wishart (GGIW).
+ *
+ * @param obj Pointer to the untracked object to be updated.
+ * @param z Pointer to the measurements associated with the object.
+ * @param radar Pointer to the radar definition used for measurements.
+ * @param object Pointer to the extended object definition.
+ *
+ * @return A structure of type GGIW_result, containing the log-likelihood and the updated state estimate.
+ */
 GGIW_result ggiwUpdate(UntrackedObj* obj,
                 measurements* z,
                 radarDefinition* radar,
@@ -22,18 +34,6 @@ GGIW_result ggiwUpdate(UntrackedObj* obj,
     Matrix x_hat = (x_hat_temp+x_hat_temp.transpose())/2;
     Matrix R_hat = x_hat*scalingFactor + R;
 
-    /* 
-    std::cout << "R_hat: \n" << R_hat;
-    std::cout << "R_hat/m: \n" << R_hat/m;
-     */
-/*     std::cout << "H \n" << H;
-    std::cout << "obj P: \n" << obj->P;
-    Matrix HP = H*obj->P;
-    std::cout << "H*obj->P: \n" << HP;
-    Matrix HT = H.transpose();
-    std::cout << "HT" << HT;
-    std::cout << "H*obj->P*H': \n" << HP*HT;
- */    
     // Innovation covariance update
     Matrix S_temp = H*obj->P*H.transpose() + R_hat/m;
     Matrix S = (S_temp+S_temp.transpose())/2;
@@ -81,7 +81,6 @@ GGIW_result ggiwUpdate(UntrackedObj* obj,
     l1 = -0.5*d*m*log(M_PI)-0.5*d*log(m);
 
     double V_det = obj->V.determinant();
-    //std::cout << V_det << std::endl;
     l2 = 0.5*(obj_v_mean)*log(V_det)-0.5*(update_v_mean)*log(tempObj.V.determinant());
 
     double b_obj = 2*log(M_PI) + lgamma(obj_v_mean/2) + lgamma(obj_v_mean/2-0.5);

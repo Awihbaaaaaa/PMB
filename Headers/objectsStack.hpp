@@ -1,4 +1,4 @@
-#ifndef OBJECTSSTACK_HPP
+/* #ifndef OBJECTSSTACK_HPP
 #define OBJECTSSTACK_HPP
 #include <iostream>
 #include "obj.hpp"
@@ -57,4 +57,4 @@ class objectsStack{
 };
 
 
-#endif
+#endif */

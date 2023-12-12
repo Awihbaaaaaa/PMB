@@ -6,16 +6,16 @@
 #include "../Headers/obj.hpp"
 #include <cmath>
 
+// Constructor to initialize the matrix from an objStateSpace object
 Matrix::Matrix(objStateSpace obj):data(5, std::vector<double>(1)){
     data[0][0] = obj.x;
-    std::cout << obj.y << "\n";
     data[1][0] = obj.y;
-    std::cout << data[0][1];
     data[2][0] = obj.v;
     data[3][0] = obj.theta;
     data[4][0] = obj.w;
 }
 
+// Overloaded stream insertion operator to print the matrix
 std::ostream& operator<<(std::ostream& os, const Matrix& m) {
     int rows = m.nrRows();
     int cols = m.nrCols();
@@ -33,18 +33,22 @@ std::ostream& operator<<(std::ostream& os, const Matrix& m) {
     return os;
 }
 
+// Getter function to return the matrix data
 std::vector<std::vector<double>> Matrix::getData() const {
     return data;
 }
 
+// Getter functions to return the number of rows
 int Matrix::nrRows() const{
     return data.size();
 }
 
+// Getter functions to return the number of columns
 int Matrix::nrCols() const{
     return data[0].size();
 }
 
+// Static function to create an identity matrix of a given size
 Matrix Matrix::identity(int size) {
     Matrix identityMatrix(size, size, 0.0);
 
@@ -55,6 +59,7 @@ Matrix Matrix::identity(int size) {
     return identityMatrix;
 }
 
+// Function to resize the matrix handling cases of shrinking and expanding
 void Matrix::resize(int newRows, int newCols){
     //data.resize(newRows, std::vector<double>(cols,0.0));
     if (newRows < 0 || newCols < 0) {
@@ -86,6 +91,7 @@ void Matrix::resize(int newRows, int newCols){
     }
 }
 
+// Function to update the matrix with new data, checking dimensions, if match then update
 void Matrix::updateData(const std::vector<std::vector<double>>& newData) {
     if (newData.size() == nrRows() && newData[0].size() == nrCols()) {
         data = newData;
@@ -96,14 +102,17 @@ void Matrix::updateData(const std::vector<std::vector<double>>& newData) {
     }
 } 
 
+// Overloaded function call operator to access matrix elements
 double& Matrix::operator()(int row, int col){
     return data[row][col];
 }
 
+// Overloaded function call operator for const access to matrix elements
 double Matrix::operator()(int row, int col) const{
     return data[row][col];
 }
 
+// Overloaded multiplication operator for matrix-matrix multiplication
 Matrix Matrix::operator*(const Matrix& other) const{
     if(nrCols() != other.nrRows()){
         std::cout << "The matrices dimensions don't match. Multiplication is not possible. Hit enter to exit.";
@@ -129,6 +138,7 @@ Matrix Matrix::operator*(const Matrix& other) const{
     return res;
 }
 
+// Overloaded multiplication operator for matrix-scalar multiplication
 Matrix Matrix::operator*(const double scaler) const{
     Matrix result(nrRows(), nrCols());
 
@@ -140,6 +150,7 @@ Matrix Matrix::operator*(const double scaler) const{
     return result;
 }
 
+// Overloaded multiplication operator for scalar-matrix multiplication
 Matrix operator*(const double scaler, const Matrix& matrix) {
     Matrix result(matrix.nrRows(), matrix.nrCols());
 
@@ -152,7 +163,7 @@ Matrix operator*(const double scaler, const Matrix& matrix) {
     return result;
 }
 
-
+// Overloaded division operator for matrix-scalar division
 Matrix Matrix::operator/(const double scaler) const {
     if (scaler == 0.0) {
         throw std::invalid_argument("Division by zero.");
@@ -167,6 +178,7 @@ Matrix Matrix::operator/(const double scaler) const {
     return result;
 }
 
+// Overloaded multiplication operator for matrix-objStateSpace multiplication
 Matrix Matrix::operator*(const objStateSpace& obj) const {
     Matrix result(3, 1);
 
@@ -177,6 +189,7 @@ Matrix Matrix::operator*(const objStateSpace& obj) const {
     return result;
 }
 
+// Overloaded addition operator for matrix-objStateSpace addition
 Matrix Matrix::operator+(const objStateSpace& obj) const {
     Matrix result(*this);  
 
@@ -189,6 +202,7 @@ Matrix Matrix::operator+(const objStateSpace& obj) const {
     return result;
 }
 
+// Overloaded addition operator for matrix-matrix addition
 Matrix Matrix::operator+(const Matrix& other) const{
     if(nrRows() != other.nrRows() || nrCols() != other.nrCols()){
         std::cout << "The matrices dimensions don't match. Addition is not possible. Hit enter to exit.";
@@ -207,6 +221,7 @@ Matrix Matrix::operator+(const Matrix& other) const{
     return res;
 }
 
+// Overloaded subtraction operator for matrix-matrix subtraction
 Matrix Matrix::operator-(const Matrix& other) const{
     if((nrRows() != other.nrRows() && ((nrCols() != other.nrCols()) || (nrCols() != 1) || (other.nrCols()!=1)))){
         std::cout << "The matrices dimensions don't match. Subtraction is not possible. Hit enter to exit.";
@@ -230,6 +245,7 @@ Matrix Matrix::operator-(const Matrix& other) const{
     return res;
 }
 
+// Overloaded assignment operator for initializing the matrix with an initializer list
 Matrix& Matrix::operator=(std::initializer_list<std::initializer_list<double>> values){
     int newRows = values.size();
     int newCols = (newRows > 0) ? values.begin()->size() : 0;
@@ -255,10 +271,12 @@ Matrix& Matrix::operator=(std::initializer_list<std::initializer_list<double>> v
     return *this;
 }
 
+// Function to check if the matrix is empty
 bool Matrix::isempty()const{
     return data.empty();
 }
 
+// Function to compute the transpose of the matrix
 Matrix Matrix::transpose() const{
     Matrix res(nrCols(),nrRows());
     for(int i = 0; i < nrRows(); i++){
@@ -270,6 +288,7 @@ Matrix Matrix::transpose() const{
     return res;
 }
 
+// Function to perform LU decomposition of the matrix
 void Matrix::luDecomposition(Matrix& L, Matrix& U) const {
     int n = nrRows();
 
@@ -319,6 +338,7 @@ void Matrix::luDecomposition(Matrix& L, Matrix& U) const {
     }
 }
 
+// Overloaded equality operator to check if two matrices are equal
 bool Matrix::operator==(const Matrix& other) const {
     if (data.size() != other.data.size() || data[0].size() != other.data[0].size()) {
         return false;
@@ -369,6 +389,7 @@ double Matrix::determinant() const {
     return det;
 }
 
+// Function to set a column in the matrix with another matrix's column data
 void Matrix::setColumn(int col, const Matrix& columnData) {
     if (col >= nrCols() || columnData.nrRows() != nrRows() || columnData.nrCols() != 1) {
         throw std::invalid_argument("Invalid column or dimension mismatch");
@@ -379,6 +400,7 @@ void Matrix::setColumn(int col, const Matrix& columnData) {
     }
 }
 
+// Function to get a column from the matrix
 Matrix Matrix::getColumn(int col) const {
     int n = nrRows();
     if (col < 0 || col >= nrCols()) {
@@ -393,6 +415,7 @@ Matrix Matrix::getColumn(int col) const {
     return column;
 }
 
+// Function to get a row from the matrix
 Matrix Matrix::getRow(int row) const {
     int n = nrCols();
     if (row < 0 || row >= n) {
@@ -408,6 +431,7 @@ Matrix Matrix::getRow(int row) const {
     return rowMatrix;
 } 
 
+// Function to remove a specified column from the matrix
 void Matrix::removeColumn(int col){
     if(col < 0 || col>nrCols()){
         throw std::invalid_argument("Invalid column or dimension mismatch");
@@ -420,6 +444,7 @@ void Matrix::removeColumn(int col){
     resize(nrRows(), nrCols()-1);
 }
 
+// Function to calculate the inverse of the matrix using LU decomposition
 Matrix Matrix::inv(){
     int n = nrRows();
     if (n != nrCols()) {
@@ -454,6 +479,7 @@ Matrix Matrix::inv(){
     return inverse;
 }
 
+// Function for forward substitution in LU decomposition
 Matrix Matrix::forwardSubstitution(const Matrix& L, const Matrix& B) const {
     int n = L.nrRows();
     Matrix Y(n, B.nrCols(), 0.0);
@@ -471,6 +497,7 @@ Matrix Matrix::forwardSubstitution(const Matrix& L, const Matrix& B) const {
     return Y;
 }
 
+// Function for backward substitution in LU decomposition
 Matrix Matrix::backwardSubstitution(const Matrix& U, const Matrix& B) const {
     int n = U.nrRows();
     Matrix X(n, B.nrCols(), 0.0);
@@ -488,20 +515,7 @@ Matrix Matrix::backwardSubstitution(const Matrix& U, const Matrix& B) const {
     return X;
 }
 
-/**
- * @brief Calculate the sum of all elements in one dimension of the matrix.
- *
- * This function computes the sum of all rows/columns in the matrix based on the parameter given.
- * It takes a parameter 'par' that can be used to specify if the requied sum should be through rows or columns.
- *
- * @param par A that controls the summation process.
- *            Use 1 if the sum should be done on rows.
- *            Use 2 if the sum should be done on rows.
- *            Otherwise, invalid argument.
- *
- * @return A matrix of size 1xnrCols() if the sum performes on rows.
- *         A matrix of size nrRows()x1 if the sum performes on cols.
- */
+// Function to calculate the sum of all elements in one dimension of the matrix
 Matrix Matrix::sum(int par) const{
     if (data.empty() || data[0].empty()) {
         return Matrix();
@@ -531,6 +545,7 @@ Matrix Matrix::sum(int par) const{
     
 }
 
+// Function to calculate the mean along a specified dimension of the matrix
 Matrix Matrix::mean(int dim) const {
     if (dim < 1 || dim > 2) {
         throw std::invalid_argument("Invalid dimension. Valid dimensions are 1 (mean along rows) or 2 (mean along columns).");
@@ -563,6 +578,7 @@ Matrix Matrix::mean(int dim) const {
     }
 }
 
+// Function to perform Cholesky factorization of the matrix
 Matrix Matrix::chol(){
     int n = nrRows();
 

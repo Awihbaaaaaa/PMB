@@ -6,10 +6,11 @@
 #include "../Headers/readCSV.hpp"
 #include "../Headers/dbscan.hpp"
 
-/* 
-This file include some test functions definitions. To run the test,
-call the function handle in main.
- */
+/**
+* @brief Following are some test functions definitions. To run the test,
+* call the function handle in main.
+* 
+*/
 
 void runRadarTest(){
     // Create a radarDefinition object

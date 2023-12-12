@@ -99,4 +99,8 @@ TrackedObj merge(std::vector<UntrackedObj>* PPP_objs,
           std::vector<TrackedObj>* newMBs,
           ExtendedObjectDefinition* extObj);
 
+double digamma(double x);
+
+double polygamma(int n, double val);
+
 #endif

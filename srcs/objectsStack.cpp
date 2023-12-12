@@ -1,4 +1,4 @@
-#include <iostream>
+/* #include <iostream>
 #include "../Headers/objectsStack.hpp"
 #include <iomanip>
 
@@ -71,4 +71,4 @@ int objectsStack::nrOfObjects(){
 /* 
 std::ostream& operator<<(std::ostream &os, const objStateSpace &obj){
     std::cout << "x = " << obj.x << ",y = " << obj.y << ", v = " << obj.v << ", theta = " << obj.theta << ",w = " << obj.w << std::endl;
-} */
+} */ 

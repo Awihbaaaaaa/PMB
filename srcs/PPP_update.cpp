@@ -1,32 +1,34 @@
 #include "../Headers/declarations.hpp"
-//#include "utilities.cpp"
 
-void updateUndetectedObjs(ObjectsCollection& PPP_objs,
+/**
+ * @brief Update undetected objects based on radar detections.
+ *
+ * This function updates the existence probabilities of untracked objects in the PPP (Poisson Point Process) model.
+ * Untracked objects that remain untracked have their probabilities reduced, and those generating measurements have adjusted probabilities.
+ * Objects with probabilities below a pruning threshold are removed from the collection.
+ *
+ * @param ObjColl ObjectsCollection containing a vector of untracked objects (PPP).
+ * @param radar Pointer to the radarDefinition providing radar-related parameters.
+ * @param extObj Pointer to the ExtendedObjectDefinition providing object-related parameters.
+ */
+void updateUndetectedObjs(ObjectsCollection& ObjColl,
                           radarDefinition* radar,
                           ExtendedObjectDefinition* extObj){
     double Pd = radar->getRadarDetectionProbability();
-    //std::cout << PPP_objs.PPP.size() << std::endl;
 
-    std::vector<UntrackedObj> tempPPP = PPP_objs.PPP;
-    /* 
-    std::cout << "Obj 1" << ": alpha: " << PPP[0].alpha << " beta: " << PPP[0].beta << " weight: " << PPP[0].w_ppp << " " << PPP[0].X << std::endl;
-    std::cout << "Obj 2" << ": alpha: " << PPP[1].alpha << " beta: " << PPP[1].beta << " weight: " << PPP[1].w_ppp << " " << PPP[1].X << std::endl;
-    std::cout << "Obj 3" << ": alpha: " << PPP[2].alpha << " beta: " << PPP[2].beta << " weight: " << PPP[2].w_ppp << " " << PPP[2].X << std::endl;
-    std::cout << "TempObj 1" << ": alpha: " << tempPPP[0].alpha << " beta: " << tempPPP[0].beta << " weight: " << tempPPP[0].w_ppp << " " << tempPPP[0].X << std::endl;
-    std::cout << "TempObj 2" << ": alpha: " << tempPPP[1].alpha << " beta: " << tempPPP[1].beta << " weight: " << tempPPP[1].w_ppp << " " << tempPPP[1].X << std::endl;
-    std::cout << "TempObj 3" << ": alpha: " << tempPPP[2].alpha << " beta: " << tempPPP[2].beta << " weight: " << tempPPP[2].w_ppp << " " << tempPPP[2].X << std::endl;
-     */
+    std::vector<UntrackedObj> tempPPP = ObjColl.PPP;
+
     double PPP_threshold = extObj->getPPP_PruningThreshold();
     double updateWppp1 = 0; 
     double updateWppp2 = 0;
     int temp =0;
-    for(int i = PPP_objs.PPP.size() - 1; i >= 0; --i){
-        updateWppp1 = (1 - Pd)*PPP_objs.PPP[i].w_ppp;
+    for(int i = ObjColl.PPP.size() - 1; i >= 0; --i){
+        updateWppp1 = (1 - Pd)*ObjColl.PPP[i].w_ppp;
         if(updateWppp1 > PPP_threshold){
-            PPP_objs.PPP[i].w_ppp = updateWppp1;
+            ObjColl.PPP[i].w_ppp = updateWppp1;
         }else{
             //std::cout << "object erased." <<std::endl;
-            PPP_objs.PPP.erase(PPP_objs.PPP.begin() + i);
+            ObjColl.PPP.erase(ObjColl.PPP.begin() + i);
             //std::cout << PPP.size() << std::endl;
             temp++;
         }
@@ -40,19 +42,10 @@ void updateUndetectedObjs(ObjectsCollection& PPP_objs,
             tempPPP.erase(tempPPP.begin() + i);
         }
     }
-    
-    /* std::cout << "Obj 1" << ": alpha: " << PPP[0].alpha << " beta: " << PPP[0].beta << " weight: " << PPP[0].w_ppp << " " << PPP[0].X << std::endl;
-    std::cout << "Obj 2" << ": alpha: " << PPP[1].alpha << " beta: " << PPP[1].beta << " weight: " << PPP[1].w_ppp << " " << PPP[1].X << std::endl;
-    std::cout << "Obj 3" << ": alpha: " << PPP[2].alpha << " beta: " << PPP[2].beta << " weight: " << PPP[2].w_ppp << " " << PPP[2].X << std::endl;
-    std::cout << "TempObj 1" << ": alpha: " << tempPPP[0].alpha << " beta: " << tempPPP[0].beta << " weight: " << tempPPP[0].w_ppp << " " << tempPPP[0].X << std::endl;
-    std::cout << "TempObj 2" << ": alpha: " << tempPPP[1].alpha << " beta: " << tempPPP[1].beta << " weight: " << tempPPP[1].w_ppp << " " << tempPPP[1].X << std::endl;
-    std::cout << "TempObj 3" << ": alpha: " << tempPPP[2].alpha << " beta: " << tempPPP[2].beta << " weight: " << tempPPP[2].w_ppp << " " << tempPPP[2].X << std::endl;
-     */
-    combinePPPs(PPP_objs.PPP, tempPPP);
-    //std::cout << PPP_objs.PPP.size() << std::endl;
-    //std::cout << "Obj 1" << ": alpha: " << PPP[0].alpha << " beta: " << PPP[0].beta << " weight: " << PPP[0].w_ppp << " " << PPP[0].X << std::endl;
 
-    if(PPP_objs.PPP.empty()){
+    combinePPPs(ObjColl.PPP, tempPPP);
+
+    if(ObjColl.PPP.empty()){
         std::cerr << "All the PPP components got pruned!\n " 
                   << "After update we prune PPP components with low weights."
                   << " If no new PPPs are added for the next recursion, we cant"
@@ -61,7 +54,19 @@ void updateUndetectedObjs(ObjectsCollection& PPP_objs,
     }
 }
 
-void createNewMBs(ObjectsCollection& PPP_objs,
+/**
+ * @brief Create new MBs (Tracked Objects) based on clustered measurements.
+ *
+ * This function processes the outgated measurements, performs ellipsoidal gating around the untracked objects to check
+ * there is measurements close to any of them, and clusters the ingated measurements using the DBSCAN algorithm.
+ * New MB components are created for each cluster, representing potential new tracked objects.
+ *
+ * @param ObjColl ObjectsCollection containing both tracked (MB) and untracked (PPP) objects.
+ * @param CurrentMeasurements Pointer to measurements struct containing raw sensor data and gating information.
+ * @param radar Pointer to the radarDefinition providing radar-related parameters.
+ * @param extObj Pointer to the ExtendedObjectDefinition providing object-related parameters.
+ */
+void createNewMBs(ObjectsCollection& ObjColl,
                   measurements* CurrentMeasurements,
                   radarDefinition* radar,
                   ExtendedObjectDefinition* extObj){
@@ -72,19 +77,7 @@ void createNewMBs(ObjectsCollection& PPP_objs,
     int minNrPnts = radar->getMinNrPntsCluster();
 
     // Local copy for the local ingating.
-    measurements localCopy = *CurrentMeasurements;/* 
-    localCopy.outGated = CurrentMeasurements->outGated;
-    localCopy.inGated = CurrentMeasurements->inGated; */
-    /* std::cout << "\n CurrentMeasurements -> z is \n";
-    std::cout << *(CurrentMeasurements->z);
-    std::cout << "Local copy z\n";
-    std::cout << *(localCopy.z);
-    std::cout << "CurrentMeasurements outgated:\n"; 
-    std::cout << CurrentMeasurements->outGated;
-    std::cout << "localCopy outgated:\n";
-    std::cout << localCopy.outGated;
-    std::cout << "localCopy ingated:\n";
-    std::cout << localCopy.inGated; */
+    measurements localCopy = *CurrentMeasurements;
 
     // We should extract the measurements that are outgated.
     int measRemoved = 0;
@@ -109,7 +102,7 @@ void createNewMBs(ObjectsCollection& PPP_objs,
     // To check which outgated measurements are located in the 
     // PPP gate.
     measurements ogrmMeas(&ogrm);
-    elipsoidalGating(radar, &PPP_objs,'P', ogrmMeas);
+    elipsoidalGating(radar, &ObjColl,'P', ogrmMeas);
     
     /* std::cout << *(ogrmMeas.z);
     std::cout << ogrmMeas.inGated;
@@ -126,9 +119,7 @@ void createNewMBs(ObjectsCollection& PPP_objs,
     */
     Matrix RawMeasInsideGates = *(CurrentMeasurements->z);
     measRemoved = 0;
-    //std::cout << RawMeasInsideGates;
 
-    //std::cout << localCopy.outGated;
     for(int i=0; i<localCopy.outGated.nrCols(); i++){
         //std::cout << localCopy.outGated(0,i) << "\n";
         if(localCopy.outGated(0,i)==0){
@@ -140,19 +131,10 @@ void createNewMBs(ObjectsCollection& PPP_objs,
         }
         measRemoved++;
     }
-    /* std::cout << "Meas ingate:\n";
-    std::cout << RawMeasInsideGates; */
 
     DBSCAN result = dbscan::run(RawMeasInsideGates, eps, minNrPnts);
-    std::cout << result;
-    std::cout << std::endl;
 
-    /* 
-    New Bernoulli Birth:
-    In the following part, the likelihood that we will get new objects will 
-    be calculated.
-    */
-   // Check that we have any measurement that belong to a cluster
+    // Check that we have any measurement that belong to a cluster
     if(!result.id.empty()){
         // Loop over the clusters
         for(std::vector<int> row:result.c){
@@ -162,7 +144,7 @@ void createNewMBs(ObjectsCollection& PPP_objs,
                 clusterMeasurements.setColumn(i,RawMeasInsideGates.getColumn(row[i]));
             }
             // Find the probability of new births
-            newBernoulliBirth(PPP_objs,
+            newBernoulliBirth(ObjColl,
                               &clusterMeasurements,
                               radar,
                               extObj);
@@ -173,32 +155,27 @@ void createNewMBs(ObjectsCollection& PPP_objs,
 }
 
 
-/* 
-PPP_update will takes in a collection of objects, tracked and untracked.
-Untracked objects will either remain untracked or get tracked. 
-1: Untracked objects remain untracked.
-   updateUndetectedObjs();
-   The existance probabilities for objects that were untracked and still untracked 
-   should be reduced.
-   This should be done in updateUndetectedObjs.
-   Untracked objects are either:
-        a: Untracked objects generated some measurements.
-        b: Untracked objects didn't generate measurements.
-
-2: The probability that we an object will get detected will be calculated,
-thus new objects will be added.
-   createNewMB();
-
-*/
+/**
+ * @brief Update undetected objects and create potentially new MBs based on current measurements.
+ *
+ * It consists of two main steps:
+ * 1. Update undetected objects: Untracked objects can either remain untracked or get tracked.
+ *    a. Untracked objects that remain untracked have their existence probabilities reduced.
+ *    b. Untracked objects that generate measurements have their probabilities adjusted.
+ * 2. Create new MBs: The probability of an object being detected is calculated, and new objects are added to the collection if detected.
+ *    Detected measurements are clustered using the DBSCAN algorithm, and new Bernoulli components are created for each cluster.
+ *
+ * @param collection ObjectsCollection containing both tracked (MB) and untracked (PPP) objects.
+ * @param currMeasurements Pointer to a struct that includes the raw measurements data, a matrix ,ingated,
+ *                         that includes measurements located inside the gates around MBs.
+                           and a matrix for outgated measurements
+ * @param radar Pointer to the radarDefinition providing radar-related parameters.
+ * @param extObj Pointer to the ExtendedObjectDefinition providing object-related parameters.
+ */
 void PPP_update(ObjectsCollection& collection,
                 measurements* currMeasurements,
                 radarDefinition* radar,
                 ExtendedObjectDefinition* extObj){
-                    /*
-                    currMeasurements is a struct that includes the raw measurements data
-                    a matrix ingated that includes measurements located inside the gates around MBs
-                    a matrix for outgated measurements
-                    */
                     updateUndetectedObjs(collection,
                                          radar,
                                          extObj);

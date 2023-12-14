@@ -1,0 +1,47 @@
+Steps for MB update:
+Input: MB, PPP, measurements, radar, obj.
+
+Output: 
+	1: Objects might be missed.
+	2: Objects are updated.
+
+Process:
+A:
+   Check if we have any MB to update, if not, return.
+
+B:
+   a: 
+     Check for the potential objects, we should always have potential objects.
+
+   b: 
+     Calculate the likelihood of missing objects
+
+   c:
+     DBSCAN
+
+   d: 
+     We might have missed an object that overlap with an actual tracked object. So we check for possible new Objects.
+
+   e: 
+     loop over the clusters.
+
+   f:
+     ggiw update for tracked objects. 
+
+   g:
+     Create a cost matrix for each object.
+
+   h:
+     Find the k best solution.
+
+   i:
+     For the valid solutions, ignore non-essential objects from the cost matrix.
+
+   j:
+     Prune MBs wih low weights.
+
+   k: 
+     We might have multiple potential objects generated from the same actual object. If so, merge them!
+
+   l:
+     remove new objects with low weights.

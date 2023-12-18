@@ -98,7 +98,12 @@ void predictMB(std::vector<TrackedObj>& MB, ExtendedObjectDefinition extendedObj
  * @param extendedObjDef An ExtendedObjectDefinition defining the motion model and other parameters.
  */
 void predict(ObjectsCollection& CurrentObjectsCollection, ExtendedObjectDefinition extendedObjDef){
+    std::cout << "Starting the prediction step ... " << std::endl;
+
+    std::cout << "Predicting the objects states for potential objects ... " << std::endl;
     predictPPP(CurrentObjectsCollection.PPP, extendedObjDef);
+
+    std::cout << "Predicting the objects states for tracked objects ... " << std::endl;
     predictMB(CurrentObjectsCollection.MB, extendedObjDef);
 }
 

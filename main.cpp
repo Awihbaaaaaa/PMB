@@ -41,12 +41,26 @@ int main() {
     TrackedObj obj1;
     obj1.X.x = 1.1;
     obj1.X.y = 2.1;
+    obj1.v = genRanNr(0, 20);
+    obj1.V(0,0) = 40;
+    obj1.V(1,1) = 45;
+    obj1.V(2,2) = 50;
+    obj1.alpha = 1;
+    obj1.beta = 1;
+
     std::cout << "Obj1:\n" << obj1.X; 
     testPPP.MB.push_back(obj1);
 
     TrackedObj obj2;
     obj2.X.x = -23;
     obj2.X.y = 23;
+    obj2.v = genRanNr(0, 20);
+    obj2.V(0,0) = 40;
+    obj2.V(1,1) = 45;
+    obj2.V(2,2) = 50;
+    obj2.alpha = 1;
+    obj2.beta = 1;
+
     std::cout << "Obj2:\n" << obj2.X ;
     testPPP.MB.push_back(obj2);
 
@@ -59,6 +73,9 @@ int main() {
     std::cout << meas;
     
     predict(testPPP, extendedObjDef);
+
+    /* std::cout << testPPP.MB[0];
+    std::cout << testPPP.MB[1]; */
 
     update(testPPP, &meas, &radar, &extendedObjDef);
     

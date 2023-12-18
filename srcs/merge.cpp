@@ -113,7 +113,9 @@ TrackedObj merge(std::vector<double>* PPP_weights, std::vector<TrackedObj>* newM
     }
     a_k = std::max(a_k, a_new);
   }
-
+  if(a_k != a_k){
+    throw std::runtime_error("Merged alpha is NaN.");
+  }
   mergedComponents.alpha = a_k;
   mergedComponents.beta = a_k/tmpBeta;
 
@@ -129,16 +131,19 @@ TrackedObj merge(std::vector<double>* PPP_weights, std::vector<TrackedObj>* newM
 
   k = 0;
   double sum0=0, sum1=0, sum2=0;
-
+  
   // Iteration to find v using Halleys
   while(k<100){
     k++;
+    sum0 = 0;
+    sum1 = 0;
+    sum2 = 0;
+
     for(int j = 1;j<=d;j++){
       sum0 += polygamma(0,(v_k-d-j)/2);
       sum1 += polygamma(1,(v_k-d-j)/2);
       sum2 += polygamma(2,(v_k-d-j)/2);
     }
-
     h_k = d*w_bar*log(v_k-d-1)-w_bar*sum0 + C;
     hp_k = d*w_bar/(v_k-d-1) -0.5*w_bar*sum1;
     hb_k = -d*w_bar/(pow(v_k-d-1,2)-0.25*w_bar*sum2);
@@ -152,6 +157,9 @@ TrackedObj merge(std::vector<double>* PPP_weights, std::vector<TrackedObj>* newM
       v_k = v_new;
     }
     v_k = std::max(v_k, v_new);
+  }
+  if(v_k != v_k){
+    throw std::runtime_error("Merged v is NaN.");
   }
   mergedComponents.v = v_k;
   mergedComponents.V = w_bar*(mergedComponents.v-d-1)*V.inv();

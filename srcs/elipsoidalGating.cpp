@@ -21,8 +21,10 @@ void elipsoidalGating(radarDefinition* radar,
                       measurements& currMeasurements){
     int rows;
     if(c=='M'){
+        std::cout << "Gating around MBs ... " << std::endl;
         rows = objs->MB.size();
     }else{
+        std::cout << "Gating around PPPs ... " << std::endl;
         rows = objs->PPP.size();
     }
     int cols = currMeasurements.z->nrCols();

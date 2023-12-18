@@ -27,9 +27,7 @@ void updateUndetectedObjs(ObjectsCollection& ObjColl,
         if(updateWppp1 > PPP_threshold){
             ObjColl.PPP[i].w_ppp = updateWppp1;
         }else{
-            //std::cout << "object erased." <<std::endl;
             ObjColl.PPP.erase(ObjColl.PPP.begin() + i);
-            //std::cout << PPP.size() << std::endl;
             temp++;
         }
 
@@ -38,7 +36,6 @@ void updateUndetectedObjs(ObjectsCollection& ObjColl,
             tempPPP[i].w_ppp = updateWppp2;
             tempPPP[i].beta = tempPPP[i].beta + 1;
         }else{
-            //std::cout << "temp object erased."<< std::endl;
             tempPPP.erase(tempPPP.begin() + i);
         }
     }
@@ -81,19 +78,12 @@ void createNewMBs(ObjectsCollection& ObjColl,
 
     // We should extract the measurements that are outgated.
     int measRemoved = 0;
-    //std::cout << *(localCopy.z);
 
-    //std::cout << localCopy.outGated;
     // outgated raw measurements
     Matrix ogrm = *(localCopy.z);
     for(int i=0; i<localCopy.outGated.nrCols(); i++){
-        //std::cout << localCopy.outGated(0,i) << "\n";
         if(localCopy.outGated(0,i)!=0){
-            //std::cout << "RawMeasInsideGates " << RawMeasInsideGates.nrCols() << ", column "<< measRemoved << "\n";
             ogrm.removeColumn(measRemoved);
-            
-            //measRemoved--;
-            //std::cout << ogrm;
             continue;
         }
         measRemoved++;
@@ -102,11 +92,9 @@ void createNewMBs(ObjectsCollection& ObjColl,
     // To check which outgated measurements are located in the 
     // PPP gate.
     measurements ogrmMeas(&ogrm);
+    std::cout << "Gating the measurements around PPP ... " << std::endl;
     elipsoidalGating(radar, &ObjColl,'P', ogrmMeas);
     
-    /* std::cout << *(ogrmMeas.z);
-    std::cout << ogrmMeas.inGated;
-    std::cout << ogrmMeas.outGated; */
     /* 
     The following loop is to extract measurements located in the gates.
     Before the loop, the measurements are copied to RawMeasInsideGates.
@@ -121,17 +109,14 @@ void createNewMBs(ObjectsCollection& ObjColl,
     measRemoved = 0;
 
     for(int i=0; i<localCopy.outGated.nrCols(); i++){
-        //std::cout << localCopy.outGated(0,i) << "\n";
         if(localCopy.outGated(0,i)==0){
-            //std::cout << "RawMeasInsideGates " << RawMeasInsideGates.nrCols() << ", column "<< measRemoved << "\n";
             RawMeasInsideGates.removeColumn(measRemoved);
-            //measRemoved--;
-            //std::cout << RawMeasInsideGates;
             continue;
         }
         measRemoved++;
     }
 
+    std::cout << "Clustering the measurements around ppp ... " << std::endl;
     DBSCAN result = dbscan::run(RawMeasInsideGates, eps, minNrPnts);
 
     // Check that we have any measurement that belong to a cluster
@@ -144,6 +129,7 @@ void createNewMBs(ObjectsCollection& ObjColl,
                 clusterMeasurements.setColumn(i,RawMeasInsideGates.getColumn(row[i]));
             }
             // Find the probability of new births
+            std::cout << "Finding the new bernoulli birth from the ppps ... " << std::endl;
             newBernoulliBirth(ObjColl,
                               &clusterMeasurements,
                               radar,
@@ -176,11 +162,13 @@ void PPP_update(ObjectsCollection& collection,
                 measurements* currMeasurements,
                 radarDefinition* radar,
                 ExtendedObjectDefinition* extObj){
+                    std::cout << "Updating the potential objects ... "<< std::endl;
                     updateUndetectedObjs(collection,
                                          radar,
                                          extObj);
                     
                     if(currMeasurements->z->nrCols() > 0){
+                        std::cout << "Creating new tracked objects from the potential objects ... "<< std::endl;
                         createNewMBs(collection,
                                      currMeasurements,
                                      radar,

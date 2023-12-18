@@ -21,10 +21,12 @@ std::vector<GGIW_result> updateMissedObjs(std::vector<TrackedObj>* currTrackedOb
     double currentBBeta,currentBAlpha;
     double Pd = radar->getRadarDetectionProbability();
     
-    double w1, w2;
+    double w1, w2, l;
     TrackedObj psi1, psi2;
     std::vector<double> tempWeights;
     std::vector<TrackedObj> tempMBs;
+    GGIW_result missedObj;
+    std::vector<GGIW_result> missedObjs;
 
     TrackedObj tmpObj;
 
@@ -34,7 +36,7 @@ std::vector<GGIW_result> updateMissedObjs(std::vector<TrackedObj>* currTrackedOb
         qd = 1-Pd+Pd*pow((currentBBeta/(currentBBeta+1)),currentBAlpha);
 
         w1 = (1-Pd)/qd;
-        w2 = Pd*pow((currentBBeta/(currentBBeta-1)),currentBAlpha)/qd;
+        w2 = Pd*pow((currentBBeta/(currentBBeta+1)),currentBAlpha)/qd;
         
         tempWeights.push_back(w1);
         tempWeights.push_back(w2);
@@ -42,22 +44,30 @@ std::vector<GGIW_result> updateMissedObjs(std::vector<TrackedObj>* currTrackedOb
         psi1 = currObj;
         psi2 = currObj;
 
-        std::cout << currObj.X;
-        std::cout << psi1.X;
+        /* std::cout << currObj.X;
+        std::cout << psi1.X; */
         psi2.beta = psi2.beta+1;
 
-        std::cout << currObj;
-        std::cout << psi1;
+        /* std::cout << currObj;
+        std::cout << psi1; */
         
         tempMBs.push_back(psi1);
         tempMBs.push_back(psi2);
 
+        std::cout << "Merging the hypotheses that an object is missed with/without generating measurements ... " << std::endl;
         tmpObj = merge(&tempWeights, &tempMBs,extObj);
+
+        tmpObj.r_MB = currObj.r_MB*qd/(1-currObj.r_MB+currObj.r_MB*qd)*radar->getDeathForce();
+
+        l = log(1 - currObj.r_MB + currObj.r_MB*qd);
+
+        missedObj.newMB = tmpObj;
+        missedObj.L = l;
+
+        missedObjs.push_back(missedObj);
     }
 
-    psi2.beta = psi2.beta+1;
-
-    //TrackedObj mergedObj = merge()
+    return missedObjs;
 }
 
 
@@ -84,6 +94,7 @@ std::vector<GGIW_result> updateMissedObjs(std::vector<TrackedObj>* currTrackedOb
  * @return No returned values are needed, the input objects collection will be updated.
  */
 void MB_update(ObjectsCollection& collection, measurements* currMeasurements, radarDefinition* radar, ExtendedObjectDefinition* extObj){
+    std::cout << "Creating the hypotheses for the tracked objects ... " << std::endl;
     double maxNrHyp = 100;
     bool maximized = false;
 
@@ -106,6 +117,14 @@ void MB_update(ObjectsCollection& collection, measurements* currMeasurements, ra
         throw std::runtime_error("No potential objects available, try to decrease the pruning threshold.");
     }
 
+    // Calculate the missedetection probability for all the tracked objects.
+    std::cout << "Finding likelihood that MBs are missed ... " << std::endl;
     std::vector<GGIW_result> missedObjUpd = updateMissedObjs(&collection.MB, currMeasurements, radar, extObj);
 
+    newBernoulliBirth(collection,
+                      currMeasurements->z,
+                      radar,
+                      extObj);
+    
+    
 };

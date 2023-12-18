@@ -190,7 +190,7 @@ class TrackedObj{
         r_MB(MB_survival) {}
 
     friend std::ostream& operator<<(std::ostream &os, const TrackedObj &obj){
-        std::cout << obj.X << ", alpha= " << obj.alpha << ", beta= " << obj.beta << ", v = " << obj.v << ".\n V" << obj.V << std::endl;
+        std::cout << obj.X << "alpha= " << obj.alpha << ", beta= " << obj.beta << ", v = " << obj.v << ".\nV =\n" << obj.V << std::endl;
     }
 };
 

@@ -25,7 +25,7 @@ void update(ObjectsCollection& collection,
             Matrix* data,
             radarDefinition* radar,
             ExtendedObjectDefinition* extObj){
-
+               std::cout << "Started the update step ..." << std::endl;
                measurements currentMeasurements(data);
                std::vector<TrackedObj> tempppppp = collection.MB;
                elipsoidalGating(radar, &collection,'M', currentMeasurements);
@@ -34,9 +34,6 @@ void update(ObjectsCollection& collection,
                           &currentMeasurements,
                           radar,
                           extObj);
-               std::cout << collection.MB.size();
-               std::cout << collection.MB[1];
-               std::cout << collection.MB[2];
 
                MB_update(collection,
                          &currentMeasurements,

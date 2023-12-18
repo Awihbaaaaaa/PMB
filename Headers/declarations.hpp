@@ -81,7 +81,7 @@ void PPP_update(ObjectsCollection& collection,
                 ExtendedObjectDefinition* extObj);
 
 void newBernoulliBirth(ObjectsCollection& PPP_objs,
-                       Matrix* clusterMeas, 
+                       const Matrix* clusterMeas, 
                        radarDefinition* radar, 
                        ExtendedObjectDefinition* extObj);
 struct GGIW_result{

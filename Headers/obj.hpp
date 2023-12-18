@@ -133,6 +133,10 @@ class UntrackedObj{
         alpha(gamma_alpha),
         beta(gamma_beta),
         w_ppp(PPP_weights){}
+
+        friend std::ostream& operator<<(std::ostream &os, const UntrackedObj &obj){
+        std::cout << obj.X << ", alpha= " << obj.alpha << ", beta= " << obj.beta << ", v = " << obj.v << ".\n V" << obj.V << std::endl;
+        }
 };
 
 /**
@@ -184,6 +188,10 @@ class TrackedObj{
         alpha(gamma_alpha),
         beta(gamma_beta),
         r_MB(MB_survival) {}
+
+    friend std::ostream& operator<<(std::ostream &os, const TrackedObj &obj){
+        std::cout << obj.X << ", alpha= " << obj.alpha << ", beta= " << obj.beta << ", v = " << obj.v << ".\n V" << obj.V << std::endl;
+    }
 };
 
 /**

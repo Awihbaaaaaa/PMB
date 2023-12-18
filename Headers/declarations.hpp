@@ -95,12 +95,17 @@ GGIW_result ggiwUpdate(UntrackedObj* obj,
                 ExtendedObjectDefinition* object);
 
 
-TrackedObj merge(std::vector<UntrackedObj>* PPP_objs,
-          std::vector<TrackedObj>* newMBs,
-          ExtendedObjectDefinition* extObj);
+TrackedObj merge(std::vector<double>* PPP_weights,
+                 std::vector<TrackedObj>* newMBs,
+                 ExtendedObjectDefinition* extObj);
 
 double digamma(double x);
 
 double polygamma(int n, double val);
+
+void MB_update(ObjectsCollection& collection,
+               measurements* currMeasurements,
+               radarDefinition* radar,
+               ExtendedObjectDefinition* extObj);
 
 #endif

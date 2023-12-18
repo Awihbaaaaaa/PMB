@@ -1,27 +1,25 @@
 #include "../Headers/declarations.hpp"
 
 /**
- * @brief Merge multiple untracked objects into a single tracked object using a weighted combination.
+ * @brief Merge multiple untracked objects into a potentially tracked object using a weighted combination.
  *
  * The function merges a collection of untracked objects, each represented by its state estimate, into a single tracked object. 
  * The merging process involves computing weighted sums of various components, including position, covariance matrices, and parameters
  * from the Gamma and Inverse Wishart distributions. The resulting tracked object represents a consolidated estimate that incorporates 
  * information from the individual untracked objects. 
  *
- * @param PPP_objs A vector of untracked objects, each providing a partial state estimate.
+ * @param PPP_weights A vector of untracked objects, each providing a partial state estimate.
  * @param newMBs A vector of tracked objects representing the possible new state estimates of the untracked objects.
  * @param extObj Pointer to the extended object definition, specifying additional characteristics of the object.
  *
  * @return A tracked object resulting from the merging process, containing a consolidated state estimate and updated parameters.
  */
-TrackedObj merge(std::vector<UntrackedObj>* PPP_objs, std::vector<TrackedObj>* newMBs, ExtendedObjectDefinition* extObj){
+TrackedObj merge(std::vector<double>* PPP_weights, std::vector<TrackedObj>* newMBs, ExtendedObjectDefinition* extObj){
   TrackedObj mergedComponents;
   double d = extObj->getExtensionDimension();
-  int nComponents = PPP_objs->size();  
+  int nComponents = PPP_weights->size();  
   
-  double w_bar = std::accumulate(PPP_objs->begin(), PPP_objs->end(), 0.0, [](double sum, const UntrackedObj& obj) {
-      return sum + obj.w_ppp;
-  });
+  double w_bar = std::accumulate(PPP_weights->begin(), PPP_weights->end(), 0.0);
   double norm_w = 1/w_bar;
   
   double alpha_min = 1;
@@ -47,7 +45,7 @@ TrackedObj merge(std::vector<UntrackedObj>* PPP_objs, std::vector<TrackedObj>* n
   // weighted sum for alpha
   double a_k = 0, tmpBeta = 0;
   for(int i = 0; i<newMBs->size(); i++){
-    w = PPP_objs->at(i).w_ppp;
+    w = PPP_weights->at(i);
     
     //std::cout << newMBs->at(i).X;
     mergedComponents.X.x += norm_w*newMBs->at(i).X.x*w;
@@ -56,9 +54,9 @@ TrackedObj merge(std::vector<UntrackedObj>* PPP_objs, std::vector<TrackedObj>* n
     mergedComponents.X.theta += norm_w*newMBs->at(i).X.theta*w;
     mergedComponents.X.w += norm_w*newMBs->at(i).X.w*w;
 
-    Matrix tmpObjStateSpaceDiff(PPP_objs->at(i).X - mergedComponents.X);
+    Matrix tmpObjStateSpaceDiff(newMBs->at(i).X - mergedComponents.X);
 
-    tmp_P = PPP_objs->at(i).P + tmpObjStateSpaceDiff*tmpObjStateSpaceDiff.transpose();
+    tmp_P = newMBs->at(i).P + tmpObjStateSpaceDiff*tmpObjStateSpaceDiff.transpose();
     weighted_tmp_P = w*tmp_P;
     mergedComponents.P = mergedComponents.P + weighted_tmp_P;
 
@@ -124,10 +122,10 @@ TrackedObj merge(std::vector<UntrackedObj>* PPP_objs, std::vector<TrackedObj>* n
   hp_k = 0;
 
   double v_new;
-  double v_k = std::accumulate(PPP_objs->begin(), PPP_objs->end(), 0.0, [](double sum, const UntrackedObj& obj) {
+  double v_k = std::accumulate(newMBs->begin(), newMBs->end(), 0.0, [](double sum, const TrackedObj& obj) {
       return sum + obj.v;
   });
-  v_k = v_k/PPP_objs->size();
+  v_k = v_k/newMBs->size();
 
   k = 0;
   double sum0=0, sum1=0, sum2=0;

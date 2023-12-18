@@ -20,21 +20,25 @@ void newBernoulliBirth(ObjectsCollection& PPP_objs,Matrix* clusterMeas, radarDef
         std::vector<TrackedObj> newMBs;
         std::vector<double> likelihoods;
         std::vector<UntrackedObj> validPPP;
+        std::vector<double> PPPWeights;
         double tempLikelihood;
+
         for(int i = 0; i < validInGatedObjs.nrRows(); i++){
             if(validInGatedObjs(i,0) !=0){
                 GGIW_result ggiw_update = ggiwUpdate(&PPP_objs.PPP[i],
                                             &currMeas,
                                             radar,
                                             extObj);
+                std::cout << PPP_objs.PPP[i].V;
                 newMBs.push_back(ggiw_update.newMB);   
                 tempLikelihood = radar->getRadarDetectionProbability()*PPP_objs.PPP[i].w_ppp*exp(ggiw_update.L);
                 likelihoods.push_back(tempLikelihood);
                 validPPP.push_back(PPP_objs.PPP[i]);
+                PPPWeights.push_back(PPP_objs.PPP[i].w_ppp);
             }
         }
         double sum = std::accumulate(likelihoods.begin(),likelihoods.end(),0.0);
-        TrackedObj mergedComponent = merge(&validPPP,
+        TrackedObj mergedComponent = merge(&PPPWeights,
                                         &newMBs,
                                         extObj);
         

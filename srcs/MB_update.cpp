@@ -16,22 +16,48 @@
  * 
  * @return A struct that include a TrackedObj and likelihod for the input object
  */
-GGIW_result updateMissedObjs(TrackedObj* currTrackedObj, measurements* currMeasurements, radarDefinition* radar, ExtendedObjectDefinition* extObj){
+std::vector<GGIW_result> updateMissedObjs(std::vector<TrackedObj>* currTrackedObjs, measurements* currMeasurements, radarDefinition* radar, ExtendedObjectDefinition* extObj){
     double qd;
-    double currentBBeta = currTrackedObj->beta;
-    double currentBAlpha = currTrackedObj->alpha;
+    double currentBBeta,currentBAlpha;
     double Pd = radar->getRadarDetectionProbability();
+    
+    double w1, w2;
+    TrackedObj psi1, psi2;
+    std::vector<double> tempWeights;
+    std::vector<TrackedObj> tempMBs;
 
-    qd = 1-Pd+Pd*pow((currentBBeta/(currentBBeta+1)),currentBAlpha);
+    TrackedObj tmpObj;
 
-    double w1 = (1-Pd)/qd;
-    double w2 = Pd*pow((currentBBeta/(currentBBeta-1)),currentBAlpha)/qd;
+    for(TrackedObj currObj:*currTrackedObjs){
+        currentBBeta = currObj.beta;
+        currentBAlpha = currObj.alpha;
+        qd = 1-Pd+Pd*pow((currentBBeta/(currentBBeta+1)),currentBAlpha);
 
-    TrackedObj psi1 = currTrackedObj;
-    TrackedObj psi2 = currTrackedObj;
+        w1 = (1-Pd)/qd;
+        w2 = Pd*pow((currentBBeta/(currentBBeta-1)),currentBAlpha)/qd;
+        
+        tempWeights.push_back(w1);
+        tempWeights.push_back(w2);
+
+        psi1 = currObj;
+        psi2 = currObj;
+
+        std::cout << currObj.X;
+        std::cout << psi1.X;
+        psi2.beta = psi2.beta+1;
+
+        std::cout << currObj;
+        std::cout << psi1;
+        
+        tempMBs.push_back(psi1);
+        tempMBs.push_back(psi2);
+
+        tmpObj = merge(&tempWeights, &tempMBs,extObj);
+    }
+
     psi2.beta = psi2.beta+1;
 
-    TrackedObj mergedObj = merge()
+    //TrackedObj mergedObj = merge()
 }
 
 
@@ -80,6 +106,6 @@ void MB_update(ObjectsCollection& collection, measurements* currMeasurements, ra
         throw std::runtime_error("No potential objects available, try to decrease the pruning threshold.");
     }
 
-    GGIW_result missedObjUpd = updateMissedObjs(collection, currMeasurements, radar, extObj);
+    std::vector<GGIW_result> missedObjUpd = updateMissedObjs(&collection.MB, currMeasurements, radar, extObj);
 
 };

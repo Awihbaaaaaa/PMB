@@ -71,7 +71,6 @@ GGIW_result ggiwUpdate(UntrackedObj* obj,
     Matrix R_hat_chol_trans_inv = R_hat_chol_trans.inv();
 
     Matrix z_hat = x_hat_chol*R_hat_chol.inv()*Z*R_hat_chol_trans_inv*x_hat_chol_transposed;
-
     tempObj.V = obj->V+N+z_hat;
 
     double l1,l2,l3,l4,l5,l6;

@@ -119,25 +119,36 @@ void createNewMBs(ObjectsCollection& ObjColl,
     std::cout << "Clustering the measurements around ppp ... " << std::endl;
     DBSCAN result = dbscan::run(RawMeasInsideGates, eps, minNrPnts);
 
+    GGIW_result* tmpTrackedObj;
+
     // Check that we have any measurement that belong to a cluster
     if(!result.id.empty()){
         // Loop over the clusters
         for(std::vector<int> row:result.c){
             //Extract measurements belong to each cluster
-            Matrix clusterMeasurements(3,row.size(),0.0);
+            /* Matrix clusterMeasurements(3,row.size(),0.0);
             for(int i=0; i<row.size(); i++){
                 clusterMeasurements.setColumn(i,RawMeasInsideGates.getColumn(row[i]));
-            }
+            } */
+            Matrix clusterMeasurements = getClusterMeas(&RawMeasInsideGates, &row);
             // Find the probability of new births
             std::cout << "Finding the new bernoulli birth from the ppps ... " << std::endl;
-            newBernoulliBirth(ObjColl,
-                              &clusterMeasurements,
-                              radar,
-                              extObj);
+            tmpTrackedObj = newBernoulliBirth(ObjColl,
+                                                &clusterMeasurements,
+                                                radar,
+                                                extObj);
+            // If we got any valid object, tmpTrackedObj will have a tracked object, otherwise 
+            // it will return a NullPtr
+            if(tmpTrackedObj->newMB.X.y != 0 ){
+                std::cout << ObjColl.MB.size() << std::endl;
+                std::cout << tmpTrackedObj->newMB;
+                ObjColl.MB.push_back(tmpTrackedObj->newMB);
+                std::cout << ObjColl.MB[2];
+                std::cout << ObjColl.MB.size();
+            }
+            delete tmpTrackedObj;
         }
     }
-
-
 }
 
 

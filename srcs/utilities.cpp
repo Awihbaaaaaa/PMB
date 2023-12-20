@@ -100,3 +100,20 @@ void combineMBs(std::vector<TrackedObj>& MB, std::vector<TrackedObj> newMB){
 }
 
 
+
+/**
+ * @brief Extract the measurements points belong to cluster.
+ * @param RawMeasInsideGates The set of all measurements recieved at the current time step.
+ * @param indices A vector of integers include the indices for the measurement belongs to a single cluster.
+ * 
+ * @return Measurements belong to a single cluster.
+ */
+Matrix getClusterMeas(const Matrix* RawMeasInsideGates, std::vector<int>* indices){
+   if(!indices->empty()){
+      Matrix clusterMeasurements(3,indices->size(),0.0);
+      for(int i=0; i<indices->size(); i++){
+            clusterMeasurements.setColumn(i,RawMeasInsideGates->getColumn(indices->at(i)));
+      }
+      return clusterMeasurements;
+   }
+}

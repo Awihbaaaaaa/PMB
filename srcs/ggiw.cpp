@@ -13,8 +13,9 @@
  * @param object Pointer to the extended object definition.
  *
  * @return A structure of type GGIW_result, containing the log-likelihood and the updated state estimate.
- */
-GGIW_result ggiwUpdate(UntrackedObj* obj,
+ *//* 
+template <typename T>
+GGIW_result ggiwUpdate(T* obj,
                 measurements* z,
                 radarDefinition* radar,
                 ExtendedObjectDefinition* object){
@@ -97,4 +98,4 @@ GGIW_result ggiwUpdate(UntrackedObj* obj,
     result.newMB = tempObj;
 
     return result;
-}
+} */

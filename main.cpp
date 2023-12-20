@@ -71,7 +71,10 @@ int main() {
         
     std::cout << "Test mesurements are:" << std::endl;
     std::cout << meas;
-    
+    TrackedObj* tmpObj;
+    if(tmpObj!=nullptr){
+        std::cout << "Null PTR";
+    }
     predict(testPPP, extendedObjDef);
 
     /* std::cout << testPPP.MB[0];

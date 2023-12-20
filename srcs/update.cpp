@@ -34,6 +34,8 @@ void update(ObjectsCollection& collection,
                           &currentMeasurements,
                           radar,
                           extObj);
+               std::cout << collection.MB.size();
+               std::cout << collection.MB[2];
 
                MB_update(collection,
                          &currentMeasurements,

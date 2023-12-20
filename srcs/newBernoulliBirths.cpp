@@ -1,8 +1,9 @@
 #include "../Headers/declarations.hpp"
 
-void newBernoulliBirth(ObjectsCollection& PPP_objs, const Matrix* clusterMeas, radarDefinition* radar, ExtendedObjectDefinition* extObj){
+GGIW_result* newBernoulliBirth(ObjectsCollection& PPP_objs, const Matrix* clusterMeas, radarDefinition* radar, ExtendedObjectDefinition* extObj){
     std::vector<double> MB_Likelihood;
     measurements currMeas(clusterMeas);
+    GGIW_result* result = new GGIW_result;
 
     std::cout << "Elipsoidal gating on measurements around the PPPs ... " << std::endl;
     elipsoidalGating(radar,&PPP_objs,'P',currMeas);
@@ -31,12 +32,13 @@ void newBernoulliBirth(ObjectsCollection& PPP_objs, const Matrix* clusterMeas, r
             }
         }
         double sum = std::accumulate(likelihoods.begin(),likelihoods.end(),0.0);
+        result->L = sum;
 
         std::cout << "Merging the objects created from the same PPP and same set of measurements ... " << std::endl;
         TrackedObj mergedComponent = merge(&PPPWeights,
                                         &newMBs,
                                         extObj);
-        
+
         // Update the new object existing probability based on how many measurements we have in a cluster
         if(currMeas.z->nrCols() == 1){
             mergedComponent.r_MB = sum/(radar->getCIClutterIntensity()+sum);
@@ -45,10 +47,11 @@ void newBernoulliBirth(ObjectsCollection& PPP_objs, const Matrix* clusterMeas, r
         }
         // std::cout << "Components got merged to: \n" << mergedComponent.X;
         if(mergedComponent.r_MB>extObj->getMB_PruningThreshold()){
-            PPP_objs.MB.push_back(mergedComponent);
+            result->newMB = mergedComponent;
         }
 
     }else{
         std::cout << "No valid component found. Checking the next cluster ..." << std::endl;
     }
+    return result;
 };

@@ -102,8 +102,8 @@ void MB_update(ObjectsCollection& collection, measurements* currMeasurements, ra
     double exProb = extObj->getExistanceThreshold();
 
     // Extract the necicerily parameters for the clustering algorithm
-    double eps = radar->getEpsCluster();
-    double nrPnt = radar->getMinNrPntsCluster();
+    std::vector<double> eps = {radar->getEpsCluster()};
+    int clusterNrPnt = radar->getMinNrPntsCluster();
 
     double state_dim = 3;
     double extDim = extObj->getExtensionDimension();
@@ -120,11 +120,50 @@ void MB_update(ObjectsCollection& collection, measurements* currMeasurements, ra
     // Calculate the missedetection probability for all the tracked objects.
     std::cout << "Finding likelihood that MBs are missed ... " << std::endl;
     std::vector<GGIW_result> missedObjUpd = updateMissedObjs(&collection.MB, currMeasurements, radar, extObj);
-
-    newBernoulliBirth(collection,
-                      currMeasurements->z,
-                      radar,
-                      extObj);
     
+    DBSCAN clustersResult = dbscan::run(*(currMeasurements->z), eps, clusterNrPnt);
+//    std::cout << clustersResult;
+
+    std::cout << "For each available cluster, creating a potential new tracked object and calculate its likelihood as well as update the tracked objects ... ";
+    std::vector<GGIW_result> newObjs;
+    std::vector<GGIW_result> updateObjs;
+
+    GGIW_result* tmpNewTrackedObjs;
+    GGIW_result* tmpUpdateTrackedObj = new GGIW_result;
+    double tempL;
+
+    // Loop over the clusters and calculate the likelihood for getting new objects from each cluster.
+    for(std::vector<int> c:clustersResult.c){
+        Matrix currentClusterMeas = getClusterMeas(currMeasurements->z,&c);
+        tmpNewTrackedObjs = newBernoulliBirth(collection,
+                                            &currentClusterMeas,
+                                            radar,
+                                            extObj);
+        newObjs.push_back(*tmpNewTrackedObjs);
+        
+        measurements currCluster(&currentClusterMeas);
+
+        // For each cluster, loop over all the already tracked objects, update their states, and calculate the likelihood that they should be updated.
+        for(TrackedObj obj:collection.MB){
+            *tmpUpdateTrackedObj = ggiwUpdate(&obj, &currCluster,radar,extObj);
+//          std::cout << tmpUpdateTrackedObj->newMB;
+            tempL = tmpUpdateTrackedObj->L;
+//          std::cout << tmpUpdateTrackedObj->L << std::endl;
+            tmpUpdateTrackedObj->newMB.r_MB = 1;
+            tmpUpdateTrackedObj->L = obj.r_MB*radar->getRadarDetectionProbability()*tmpUpdateTrackedObj->L;
+//          std::cout << tmpUpdateTrackedObj->L << std::endl;
+            updateObjs.push_back(*tmpUpdateTrackedObj);
+        }
+    }
+
+    // Following is the 
+    //|--------------------------------------------------------------|
+    //|object_updates |object missed diagonal|           inf         | {object count}
+    //|new MB diagonal|         inf          | ignore new MB diagonal| {cluster count}
+    //|--------------------------------------------------------------|
+    //|{cluster count}| {object count}       | {cluster count}
+    
+    
+
     
 };

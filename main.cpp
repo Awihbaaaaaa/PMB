@@ -7,6 +7,7 @@ int main() {
     double T = 0.1, sigmaV = 1.0, sigmav = M_PI/15; 
     ctModel motionModel(T,sigmaV, sigmav);
 
+    testAssign2DByCol();
     // Extended object representation parameters
     double extentDim = 3, survivalProbability = 0.35, shapeUncertainty = 0.1;
     double forgettingFactor = 8;

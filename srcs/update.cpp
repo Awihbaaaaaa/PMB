@@ -41,8 +41,6 @@ void update(ObjectsCollection& collection,
                          &currentMeasurements,
                          radar,
                          extObj);
-
-
             };
 
 

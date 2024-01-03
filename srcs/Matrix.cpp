@@ -15,6 +15,36 @@ Matrix::Matrix(objStateSpace obj):data(5, std::vector<double>(1)){
     data[4][0] = obj.w;
 }
 
+// Function to calculate the minimum value in the matrix
+double Matrix::min() const {
+    if (data.empty() || data[0].empty()) {
+        throw std::out_of_range("Matrix is empty.");
+    }
+
+    double minValue = data[0][0];
+    for (const auto& row : data) {
+        for (double value : row) {
+            minValue = std::min(minValue, value);
+        }
+    }
+    return minValue;
+}
+
+// Function to calculate the maximum value in the matrix
+double Matrix::max() const {
+    if (data.empty() || data[0].empty()) {
+        throw std::out_of_range("Matrix is empty.");
+    }
+
+    double maxValue = data[0][0];
+    for (const auto& row : data) {
+        for (double value : row) {
+            maxValue = std::max(maxValue, value);
+        }
+    }
+    return maxValue;
+}
+
 // Overloaded stream insertion operator to print the matrix
 std::ostream& operator<<(std::ostream& os, const Matrix& m) {
     int rows = m.nrRows();
@@ -219,6 +249,58 @@ Matrix Matrix::operator+(const Matrix& other) const{
     }
 
     return res;
+}
+
+// Overloaded addition operator for matrix-scalar addition
+Matrix Matrix::operator+(const double scalar) const {
+    Matrix result(*this);
+
+    for (int i = 0; i < nrRows(); i++) {
+        for (int j = 0; j < nrCols(); j++) {
+            result(i, j) += scalar;
+        }
+    }
+
+    return result;
+}
+
+// Overloaded addition operator for scalar-matrix addition
+Matrix operator+(const double scalar, const Matrix& matrix) {
+    Matrix result(matrix);
+
+    for (int i = 0; i < matrix.nrRows(); i++) {
+        for (int j = 0; j < matrix.nrCols(); j++) {
+            result(i, j) += scalar;
+        }
+    }
+
+    return result;
+}
+
+// Overloaded addition operator for matrix-scalar subtraction
+Matrix Matrix::operator-(const double scalar) const {
+    Matrix result(*this);
+
+    for (int i = 0; i < nrRows(); i++) {
+        for (int j = 0; j < nrCols(); j++) {
+            result(i, j) -= scalar;
+        }
+    }
+
+    return result;
+}
+
+// Overloaded addition operator for scalar-matrix subtraction
+Matrix operator-(const double scalar, const Matrix& matrix) {
+    Matrix result(matrix);
+
+    for (int i = 0; i < matrix.nrRows(); i++) {
+        for (int j = 0; j < matrix.nrCols(); j++) {
+            result(i, j) = scalar - result(i,j);
+        }
+    }
+
+    return result;
 }
 
 // Overloaded subtraction operator for matrix-matrix subtraction

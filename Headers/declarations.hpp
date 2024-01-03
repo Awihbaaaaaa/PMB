@@ -28,6 +28,12 @@ void objectCreationTest();
 
 void TestDBSCAN();
 
+void testKeyVal();
+
+void testBinaryHeap();
+
+void testAssign2DByCol();
+
 void readCSV();
 
 double deg2rad(double degrees);
@@ -192,4 +198,8 @@ void MB_update(ObjectsCollection& collection,
 
 Matrix getClusterMeas(const Matrix* RawMeasInsideGates, std::vector<int>* indices);
 
+void assign2DByCol(std::vector<std::vector<int>>& C, bool maximize,
+                   std::vector<int>& col4row, std::vector<int>& row4col, int& gain,
+                   std::vector<int>& u, std::vector<int>& v);
+                   
 #endif

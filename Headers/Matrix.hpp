@@ -232,6 +232,28 @@ class Matrix{
          * @return The result of adding the objStateSpace object to the matrix.
          */
         Matrix operator+(const objStateSpace& obj) const;
+
+        /**
+         * @brief Overloaded operator to implement scalar addition to a matrix (matrix+scalar).
+         *
+         * This operator adds a matrix and a scaler and returns the result in the form matrix + scalar.
+         *
+         * @param scalar The double value to be added to a matrix.
+         *
+         * @return The result of adding a double value to a matrix.
+         */
+        Matrix operator+(const double scalar) const;
+
+        /**
+         * @brief Overloaded operator to implement scalar subtraction from a matrix (matrix-scalar).
+         *
+         * This operator subtracts a scalar from a matrix and returns the result as a matrix.
+         *
+         * @param scalar The double value to be removed to a matrix.
+         *
+         * @return The result of adding a double value to a matrix.
+         */
+        Matrix operator-(const double scalar) const;
         
         /**
          * @brief Overloaded operator to subtract two matrices.
@@ -341,6 +363,10 @@ class Matrix{
          */
         Matrix chol();
         
+        double max() const;
+
+        double min() const;
+
         /**
          * @brief Overloaded stream insertion operator to print the matrix.
          *

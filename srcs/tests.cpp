@@ -5,6 +5,10 @@
 #include <cmath>
 #include "../Headers/readCSV.hpp"
 #include "../Headers/dbscan.hpp"
+#include "../Headers/KeyVal.hpp"
+#include "../Headers/BinaryHeap.hpp"
+#include "../Headers/assign2DByCol.hpp"
+
 
 /**
 * @brief Following are some test functions definitions. To run the test,
@@ -211,3 +215,89 @@ void TestDBSCAN(){
         std::cout << std::endl;
     }
 }
+
+void testKeyVal(){
+    KeyVal kv1(1.0, 10.0);
+    KeyVal kv2(2.0, 20.0);
+    KeyVal kv3(3.0, 30.0);
+    KeyVal kv4(4.0, 30.0);
+
+    // Test comparison operators
+    assert(kv1 < kv2);
+    assert(kv2 > kv1);
+    assert(kv1 <= kv2);
+    assert(kv2 >= kv1);
+    assert(kv1 != kv2);
+    assert(kv1 == kv1);
+    std::cout << "KelVal comparison tests passed.\n";
+
+    // Test getKey method
+    assert(kv1.getKey() == 1);
+    std::cout << "GetKey passed.\n";
+
+}
+
+void testBinaryHeap() {
+    // Test 1: Insert elements into a max heap
+    BinaryHeap maxHeap(10, true);
+    maxHeap.insert(3, 30);
+    maxHeap.insert(2, 20);
+    maxHeap.insert(1, 10);
+
+    assert(maxHeap.heapSize() == 3);
+    assert(maxHeap.getTop().getKey() == 3);
+
+    // Test 2: Delete top element from max heap
+    KeyVal deletedMax = maxHeap.deleteTop();
+    assert(deletedMax.getKey() == 3);
+    assert(maxHeap.heapSize() == 2);
+    KeyVal tempKV = maxHeap.getTop();
+    //std::cout << maxHeap.getTop().getKey() << "\n";
+    assert(maxHeap.getTop().getKey() == 2);
+
+    // Test 3: Build heap from keys and data arrays
+    std::vector<int> keys = {5, 3, 1, 4, 2};
+    std::vector<int> data = {50, 30, 10, 40, 20};
+    BinaryHeap builtHeap(5, false);
+    builtHeap.buildHeapFromKeysData(keys, data);
+
+    assert(builtHeap.heapSize() == 5);
+    //std::cout << builtHeap.getTop().getKey() << "\n";
+    assert(builtHeap.getTop().getKey() == 1);
+
+    std::cout << "All binary heap tests passed!" << std::endl;
+}
+
+void testAssign2DByCol() {
+    std::vector<std::vector<int>> costMatrix = {
+        {1, 2, 3},
+        {4, 5, 6},
+        {7, 8, 9}
+    };
+
+    std::vector<int> col4row(costMatrix.size(),-1), row4col(costMatrix[0].size(),-1);
+    for(int nummm:col4row){
+        std::cout << nummm << std::endl;
+    }
+    int gain;
+    std::vector<int> u, v;
+
+    // Test the function with the test case
+    assign2DByCol(costMatrix, false, col4row, row4col, gain, u, v);
+
+    // Display the results
+    std::cout << "col4row: ";
+    for (size_t i = 0; i < col4row.size(); ++i) {
+        std::cout << "(" << i << "," << col4row[i] << ") ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "row4col: ";
+    for (size_t i = 0; i < row4col.size(); ++i) {
+        std::cout << "(" << i << "," << row4col[i] << ") ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "Gain: " << gain << std::endl;
+}
+
